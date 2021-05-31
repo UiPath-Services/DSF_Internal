@@ -7,3 +7,8 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Arguments = " /C C:\Temp\folderSelector.exe"
 $Shortcut.Save()
+
+try{
+  & "C:\Temp\git.ps1"
+}catch{ Write-Host "script not found"}
+finally { Remove-Item -Path C:\Temp\git.ps1 -Force }
