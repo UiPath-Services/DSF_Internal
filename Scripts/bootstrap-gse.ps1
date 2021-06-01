@@ -12,9 +12,6 @@ try{
   & "C:\Temp\sap.ps1"
 }catch{ Write-Host "script not found"}
 
-try{
-  & "C:\Temp\InstallUiPathRobot.ps1"
-}catch{ Write-Host "script not found"}
 
 try{
   & "C:\Temp\git.ps1"
