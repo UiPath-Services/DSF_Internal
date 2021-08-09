@@ -14,6 +14,18 @@
                 "description": "VMs Admin password"
             }
         },
+        "version": {
+            "defaultValue": "20.10.2",
+            "allowedValues": [
+                "0.0.0",
+                "19.10.21",
+				"20.10.2"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "Orchestrator Version"
+            }
+        },
         "environment": {
             "defaultValue": "POV",
             "allowedValues": [
@@ -57,7 +69,7 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "imageName": "Orchestrator",
 		"galleryName": "ProductSupport",
-        "imageVersion": "20.10.2",
+        "imageVersion": "[parameters('version')]",
 		"imageRef": "[resourceId('DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "pmVM":  {
             "POV": {
