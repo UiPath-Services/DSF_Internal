@@ -1,12 +1,42 @@
 Add-MpPreference -ExclusionPath "C:\Temp"
 
-$TargetFile = "$env:SystemRoot\System32\cmd.exe"
-$ShortcutFile = "$env:Public\Desktop\Cloud Provision.exe"
+try{
+$TargetFile = "C:\Temp\Cloud Folder Selector UI Provision Setup 1.0.0.exe"
+$ShortcutFile = "$env:Public\Desktop\Cloud Provision.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
-$Shortcut.Arguments = " /C C:\Temp\Cloud Folder Selector UI Provision Setup 1.0.0.exe"
 $Shortcut.Save()
+}catch{ Write-Host "script not found"}
+
+
+try{
+$TargetFile = "C:\Temp\Staging Internal Folder Selector UI Provision Setup 1.0.0.exe"
+$ShortcutFile = "$env:Public\Desktop\Staging Provision.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+}catch{ Write-Host "script not found"}
+
+try{
+$TargetFile = "C:\Temp\Staging Internal Folder Selector UI Provision Setup 1.0.0.exe"
+$ShortcutFile = "$env:Public\Desktop\Staging Provision.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+}catch{ Write-Host "script not found"}
+
+try{
+$TargetFile = "C:\Program Files (x86)\Postman\Postman.exe"
+$ShortcutFile = "$env:Public\Desktop\Postman.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+}catch{ Write-Host "script not found"}
+
 
 try{
   & "C:\Temp\sap.ps1"
