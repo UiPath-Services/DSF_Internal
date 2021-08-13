@@ -21,7 +21,7 @@ $Shortcut.Save()
 
 try{
 $TargetFile = "C:\Temp\Staging External - Folder Selector UI Provision Setup 1.0.0"
-$ShortcutFile = "$env:Public\Desktop\Staging Provision.lnk"
+$ShortcutFile = "$env:Public\Desktop\Staging External - Robot.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
