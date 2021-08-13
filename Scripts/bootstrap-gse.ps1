@@ -20,7 +20,7 @@ $Shortcut.Save()
 }catch{ Write-Host "script not found"}
 
 try{
-$TargetFile = "C:\Temp\Staging Internal Folder Selector UI Provision Setup 1.0.0.exe"
+$TargetFile = "C:\Temp\Staging External - Folder Selector UI Provision Setup 1.0.0"
 $ShortcutFile = "$env:Public\Desktop\Staging Provision.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
