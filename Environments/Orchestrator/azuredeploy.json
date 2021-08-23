@@ -216,7 +216,7 @@
             "apiVersion": "2019-03-01",
             "location": "[variables('location')]",
             "tags": {
-                "AlwaysPoweredOn": "True",
+                "AlwaysPoweredOn": "False",
                 "JITExemption": "Yes",
                 "Project": "DSF-Project"
             },
@@ -236,22 +236,12 @@
                         "id": "[variables('imageRef')]"
                     }
                 },
-                
                 "networkProfile": {
                     "networkInterfaces": [
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                         }
                     ]
-                },
-                "osProfile": {
-                    "computerName": "[variables('vmName')]",
-                    "adminusername": "[parameters('adminusername')]",
-                    "adminpassword": "[parameters('adminpassword')]",
-                    "windowsConfiguration": {
-                        "enableAutomaticUpdates": false,
-                        "provisionVmAgent": true
-                    }
                 }
             },
             "dependsOn": [
@@ -270,6 +260,9 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": "[split(variables('scriptUriBase'), ' ')]"
+				  
+									  
+																	
                 }
             },
             "dependsOn": [
