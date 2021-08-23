@@ -70,21 +70,30 @@
         "imageName": "Orchestrator",
 		"galleryName": "ProductSupport",
         "imageVersion": "[parameters('version')]",
-		"imageRef": "[resourceId('DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																											   
+		"imageRef": "[resourceId('DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+																																								  
+																		  
+																																						 
+																			   
+																	
+																													   
         "pmVM":  {
             "POV": {
-                "virtualMachineSize": "Standard_D4s_v4",
+                "virtualMachineSize": "Standard_B4ms",
                 "diskSizeGB": 128
             },
             "PILOT": {
-                "virtualMachineSize": "Standard_D4s_v4",
+                "virtualMachineSize": "Standard_B4ms",
                 "diskSizeGB": 128
             },
             "BOOTCAMP": {
-                "virtualMachineSize": "Standard_D8s_v4",
+                "virtualMachineSize": "Standard_B4ms",
                 "diskSizeGB": 128
             }
-        }																																					  															  																																																													
+        }
+																																					  
+															  
+																																																														
     },
     "resources": [
         {
@@ -234,7 +243,15 @@
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                         }
                     ]
-		 
+				  
+							  
+															
+																	 
+																	 
+											 
+														
+												
+					 
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
@@ -248,7 +265,28 @@
             },
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
-            ] 
+            ]
+		  
+		 
+																   
+																			 
+									   
+												  
+						   
+												 
+												
+											
+												
+							 
+																		  
+				  
+									  
+																	
+				 
+			  
+						  
+																					 
+			 
         }
     ],
       "outputs": {
