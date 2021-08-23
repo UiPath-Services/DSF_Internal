@@ -71,6 +71,12 @@
 		"galleryName": "ProductSupport",
         "imageVersion": "[parameters('version')]",
 		"imageRef": "[resourceId('DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+																																								  
+																		  
+																																						 
+																			   
+																	
+																													   
         "pmVM":  {
             "POV": {
                 "virtualMachineSize": "Standard_D4s_v4",
@@ -85,6 +91,9 @@
                 "diskSizeGB": 128
             }
         }
+																																					  
+															  
+																																																														
     },
     "resources": [
         {
@@ -240,7 +249,7 @@
                     "adminusername": "[parameters('adminusername')]",
                     "adminpassword": "[parameters('adminpassword')]",
                     "windowsConfiguration": {
-                        "enableAutomaticUpdates": true,
+                        "enableAutomaticUpdates": false,
                         "provisionVmAgent": true
                     }
                 }
@@ -261,9 +270,6 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": "[split(variables('scriptUriBase'), ' ')]"
-                },
-                "protectedSettings": {
-                    "commandToExecute": "[variables('configurePM')]"
                 }
             },
             "dependsOn": [
@@ -271,7 +277,11 @@
             ]
         }
     ],
-    "outputs": {
+      "outputs": {
+        "FQDN": {
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
+            "type": "string"
+        },
         "adminusername": {
             "type": "String",
             "value": "[parameters('adminusername')]"
@@ -279,18 +289,7 @@
         "adminpassword": {
             "type": "String",
             "value": "[parameters('adminpassword')]"
-        },
-        "vmDNS": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
-            "type": "string"
-        },
-        "SuperadminUsername": {
-            "type": "String",
-            "value": "PM-Admin"
-        },
-        "SuperadminPassword": {
-            "type": "String",
-            "value": "fR1WiA3AZz!%"
+			   
         }
     }
 }
