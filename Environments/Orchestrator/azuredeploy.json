@@ -247,27 +247,6 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ]
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/CustomScriptExtension')]",
-            "apiVersion": "2015-06-15",
-            "location": "[variables('location')]",
-            "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.7",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[split(variables('scriptUriBase'), ' ')]"
-				  
-									  
-																	
-                }
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-            ]
         }
     ],
       "outputs": {
