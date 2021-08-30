@@ -2,18 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "adminusername": {
-            "type": "String",
-            "metadata": {
-                "description": "VMs Admin username"
-            }
-        },
-        "adminpassword": {
-            "type": "String",
-            "metadata": {
-                "description": "VMs Admin password"
-            }
-        },
         "version": {
             "defaultValue": "20.10.2",
             "allowedValues": [
@@ -249,11 +237,11 @@
         },
         "adminusername": {
             "type": "String",
-            "value": "[parameters('adminusername')]"
+            "value": "admin_1"
         },
         "adminpassword": {
             "type": "String",
-            "value": "[parameters('adminpassword')]"			   
+            "value": "1!Nought-roy-ripoff"			   
         }
     }
 }
