@@ -1,7 +1,7 @@
 Add-MpPreference -ExclusionPath "C:\Temp"
 
 try{
-$TargetFile = "C:\Temp\Staging External - Folder Selector UI Provision Setup 1.0.0"
+$TargetFile = "C:\Temp\Staging External - Folder Selector UI Provision Setup 1.0.0.exe"
 $ShortcutFile = "$env:Public\Desktop\Staging External - Robot.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
