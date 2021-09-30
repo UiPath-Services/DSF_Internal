@@ -58,7 +58,7 @@
         "imageName": "Insights",
 		"galleryName": "ProductSupport",
         "imageVersion": "[parameters('version')]",
-		"imageRef": "[resourceId('DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																													   
+		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																													   
         "pmVM":  {
             "POV": {
                 "virtualMachineSize": "Standard_B4ms",
