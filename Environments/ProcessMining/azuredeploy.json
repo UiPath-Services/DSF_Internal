@@ -64,7 +64,7 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "imageName": "ProcessMining",
 		"galleryName": "DSF_POC",
-        "imageVersion": "1.0.1",
+        "imageVersion": "1.0.4",
 		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','DSF-Presales-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "scriptUriBase": "https://raw.githubusercontent.com/UiPath-Services/DSF_Internal/main/Environments/ProcessMining/Setup/bootstrap.ps1",
         "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
