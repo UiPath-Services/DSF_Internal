@@ -7,6 +7,7 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
+$ "C:\Temp\dsf-provisioner-1.0.0 Setup.exe"
 }catch{ Write-Host "script not found"}
 
 
