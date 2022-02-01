@@ -30,7 +30,7 @@
         },
         "agentNodeCount": {
             "type": "int",
-            "defaultValue": 1,
+            "defaultValue": 0,
             "minValue": 0,
             "maxValue": 2,
             "allowedValues": [
@@ -167,10 +167,6 @@
             "metadata": {
                 "description": "Flag which determines whether Document Understanding should be installed."
             }
-        },
-        "tagsByResource": {
-            "type": "object",
-            "defaultValue": {}
         }
     },
     "variables": {
@@ -215,7 +211,7 @@
             "name": "[variables('preChecksDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -262,7 +258,7 @@
                         "value": true
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -271,7 +267,7 @@
             "name": "[variables('vaultDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
@@ -300,7 +296,7 @@
                         "value": "[resourceGroup().location]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -313,7 +309,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]",
                 "[resourceId('Microsoft.Resources/deployments', variables('vaultDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -343,7 +339,7 @@
                         }
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -352,7 +348,7 @@
             "name": "[variables('networkDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
@@ -384,7 +380,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -396,7 +392,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -410,7 +406,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -425,7 +421,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('storageDeploymentName'))]",
                 "[resourceId('Microsoft.Resources/deployments', variables('dnsDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -567,7 +563,7 @@
                         "value": "[variables('scriptUris')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -580,7 +576,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -612,7 +608,7 @@
                         "value": "[variables('scriptUris')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
@@ -624,7 +620,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -641,7 +637,7 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": {}
                     }
                 }
             }
