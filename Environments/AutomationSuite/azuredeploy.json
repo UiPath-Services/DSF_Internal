@@ -2,17 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-     "automationSuiteVersion": {
-            "type": "string",
-            "defaultValue": "2021.10.3",
-            "allowedValues": [
-                "2021.10.3"
-            ],
-            "metadata": {
-                "description": "Version of UiPath Automation Suite to be installed."
-            }
-        },
-        "serverNodeCount": {
+    "serverNodeCount": {
             "defaultValue": 1,
             "allowedValues": [
                 1,
@@ -198,8 +188,6 @@
             "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/scripts/continueInstallServer.sh",
             "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/scripts/validateFullInstall.sh"
         },
-          "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
-        "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
         "baseName": "[substring(concat('u',uniqueString(resourceGroup().id, deployment().name)), 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
