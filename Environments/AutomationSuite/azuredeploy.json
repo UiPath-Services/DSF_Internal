@@ -492,10 +492,7 @@
                             "secretName": "adminPassword"
                         }
                     },
-                    "automationSuiteVersion": {
-                        "value":  "2021.10.3"
-                    },
-                    "argoCDPassword": {
+                   "argoCDPassword": {
                         "value": "[reference(variables('vaultDeploymentName')).outputs.argoCDPassword.value]"
                     },
                     "actionCenterInstallFlag": {
