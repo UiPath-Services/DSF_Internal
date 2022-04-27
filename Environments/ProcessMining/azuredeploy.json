@@ -2,6 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+	    
+	"Extrnal Usage": {
+            "defaultValue": "for external usage please make sure to follow the instructions here: https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
+            "type": "String",
+            "metadata": {
+                "description": "Process Mining for external"
+            }
+        },   
         "adminusername": {
             "type": "String",
             "metadata": {
@@ -284,14 +292,6 @@
         "vmDNS": {
             "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
             "type": "string"
-        },
-        "SuperadminUsername": {
-            "type": "String",
-            "value": "PM-Admin"
-        },
-        "SuperadminPassword": {
-            "type": "String",
-            "value": "fR1WiA3AZz!%"
         }
     }
 }
