@@ -3,8 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
 	    
-	"Extrnal Usage": {
-            "defaultValue": "for external usage please make sure to follow the instructions here: https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
+	"Check for External Usage": {
+            "defaultValue": "https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
             "type": "String",
             "metadata": {
                 "description": "Process Mining for external"
