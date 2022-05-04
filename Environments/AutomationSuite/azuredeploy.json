@@ -452,9 +452,6 @@
                     "ILBIp": {
                         "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
                     },
-                    "deployInExistingVnet": {
-                        "value": true
-                    },
                     "serverNodeCount": {
                         "value": "[parameters('serverNodeCount')]"
                     },
