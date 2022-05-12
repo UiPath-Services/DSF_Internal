@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
 	    
-	"Check for EXTERNAL Usage": {
+	"Check for External Usage": {
             "defaultValue": "https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
             "type": "String",
             "metadata": {
@@ -58,7 +58,7 @@
         "subnetName": "[concat(variables('virtualNetworkName'), '-subnet')]",
         "networkSecurityGroupName": "default-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-        "imageName": "process_mining",
+        "imageName": "ProcessMining",
 		"galleryName": "dsf_images",
         "imageVersion": "1.1.0",
 		"imageRef": "[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
