@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
 	    
-	"Check for External Usage": {
+	"Check for EXTERNAL Usage": {
             "defaultValue": "https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
             "type": "String",
             "metadata": {
