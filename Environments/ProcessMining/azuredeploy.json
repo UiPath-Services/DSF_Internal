@@ -86,7 +86,7 @@
 								 
 			 
 		 
-	  
+	 }, 
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
@@ -286,5 +286,4 @@
             "type": "string"							   
         }
     }
-}
 }
