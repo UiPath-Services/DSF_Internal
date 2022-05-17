@@ -20,19 +20,7 @@
             "metadata": {
                 "description": "ProcessMining license"
             }
-        },
-						
-								  
-							  
-					  
-						
-						  
-			  
-							 
-						 
-									 
-			 
-		  
+        },	  
         "location": {
             "defaultValue": "westeurope",
             "allowedValues": [
