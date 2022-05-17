@@ -29,18 +29,6 @@
                 "description": "ProcessMining license"
             }
         },
-        "environment": {
-            "defaultValue": "POV",
-            "allowedValues": [
-                "POV",
-                "PILOT",
-                "BOOTCAMP"
-            ],
-            "type": "String",
-            "metadata": {
-                "description": "Resources size based on environment type"
-            }
-        },
         "location": {
             "defaultValue": "westeurope",
             "allowedValues": [
@@ -70,32 +58,17 @@
         "subnetName": "[concat(variables('virtualNetworkName'), '-subnet')]",
         "networkSecurityGroupName": "default-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-        "imageName": "ProcessMining",
-		"galleryName": "DSF_POC",
-        "imageVersion": "1.0.4",
-		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','DSF-Presales-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+        "imageName": "process_mining",
+		"galleryName": "dsf_images",
+        "imageVersion": "1.1.0",
+		"imageRef": "[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "scriptUriBase": "https://raw.githubusercontent.com/UiPath-Services/DSF_Internal/main/Environments/ProcessMining/Setup/bootstrap.ps1",
         "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
         "scriptFileString": "[variables('scriptUriNamePieces')[sub(length(variables('scriptUriNamePieces')), 1)]]",
         "scriptFileBreakString": "[split(variables('scriptFileString'), '?')]",
         "scriptFileName": "[variables('scriptFileBreakString')[0]]",
         "configurePM": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ', variables('scriptFileName'),' ','-licenseCode',' ',parameters('licenseCode'))]",
-        "pmVM":  {
-            "POV": {
-                "virtualMachineSize": "Standard_D4s_v4",
-                "diskSizeGB": 128
-            },
-            "PILOT": {
-                "virtualMachineSize": "Standard_D4s_v4",
-                "diskSizeGB": 128
-            },
-            "BOOTCAMP": {
-                "virtualMachineSize": "Standard_D8s_v4",
-                "diskSizeGB": 128
-            }
-        }
-    },
-    "resources": [
+           "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-08-01",
@@ -222,12 +195,13 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('pmVM')[parameters('environment')].virtualMachineSize]"
+                                        "vmSize": "Standard_B4ms"
+
                 },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
-                        "diskSizeGB": "[variables('pmVM')[parameters('environment')].diskSizeGB]",
+                        "diskSizeGB": "128",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
@@ -236,7 +210,6 @@
                         "id": "[variables('imageRef')]"
                     }
                 },
-                
                 "networkProfile": {
                     "networkInterfaces": [
                         {
@@ -281,6 +254,10 @@
         }
     ],
     "outputs": {
+				 
+																																													 
+							
+		  
         "adminusername": {
             "type": "String",
             "value": "[parameters('adminusername')]"
