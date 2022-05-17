@@ -1,7 +1,7 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {  
+    "parameters": {
         "adminusername": {
             "type": "String",
             "metadata": {
@@ -21,6 +21,18 @@
                 "description": "ProcessMining license"
             }
         },
+						
+								  
+							  
+					  
+						
+						  
+			  
+							 
+						 
+									 
+			 
+		  
         "location": {
             "defaultValue": "westeurope",
             "allowedValues": [
@@ -51,16 +63,31 @@
         "networkSecurityGroupName": "default-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "imageName": "process_mining",
-	"galleryName": "dsf_images",
+		"galleryName": "dsf_images",
         "imageVersion": "1.1.0",
-	"imageRef": "[resourceId('dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+		"imageRef": "[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "scriptUriBase": "https://raw.githubusercontent.com/UiPath-Services/DSF_Internal/main/Environments/ProcessMining/Setup/bootstrap.ps1",
         "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
         "scriptFileString": "[variables('scriptUriNamePieces')[sub(length(variables('scriptUriNamePieces')), 1)]]",
         "scriptFileBreakString": "[split(variables('scriptFileString'), '?')]",
         "scriptFileName": "[variables('scriptFileBreakString')[0]]",
         "configurePM": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ', variables('scriptFileName'),' ','-licenseCode',' ',parameters('licenseCode'))]",
-           "resources": [
+				  
+					
+														
+								 
+			  
+					  
+														
+								 
+			  
+						 
+														
+								 
+			 
+		 
+	  
+    "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-08-01",
@@ -201,6 +228,7 @@
                         "id": "[variables('imageRef')]"
                     }
                 },
+				
                 "networkProfile": {
                     "networkInterfaces": [
                         {
@@ -244,7 +272,7 @@
             ]
         }
     ],
-    "outputs": {				 																																													 						  
+    "outputs": {
         "adminusername": {
             "type": "String",
             "value": "[parameters('adminusername')]"
@@ -255,7 +283,8 @@
         },
         "vmDNS": {
             "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
-            "type": "string"
+            "type": "string"							   
         }
     }
+}
 }
