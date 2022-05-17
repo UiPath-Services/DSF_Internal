@@ -1,15 +1,7 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-	    
-	"CheckForExternalUsage": {
-            "defaultValue": "https://uipath.atlassian.net/wiki/spaces/RFI/pages/86863315580/DSF+for+clients+and+partners",
-            "type": "String",
-            "metadata": {
-                "description": "Process Mining for External"
-            }
-        },   
+    "parameters": {  
         "adminusername": {
             "type": "String",
             "metadata": {
