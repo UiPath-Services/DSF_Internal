@@ -14,24 +14,16 @@
                 "description": "VMs Admin password"
             }
         },
-        "environment": {
-            "defaultValue": "POV",
-            "allowedValues": [
-                "POV",
-                "PILOT",
-                "BOOTCAMP"
-            ],
-            "type": "String",
-            "metadata": {
-                "description": "Resources size based on environment type"
-            }
-        },
         "location": {
             "defaultValue": "eastus",
             "allowedValues": [
                 "eastus",
                 "westeurope",
-                "centralus"
+                "centralus",
+                "centralindia",
+                "japaneast"
+							   
+						   
             ],
             "type": "String",
             "metadata": {
@@ -62,20 +54,6 @@
         "scriptFileBreakString": "[split(variables('scriptFileString'), '?')]",
         "scriptFileName": "[variables('scriptFileBreakString')[0]]",
         "configureVM": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ', variables('scriptFileName'))]",
-        "pmVM": {
-            "POV": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "PILOT": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "BOOTCAMP": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            }
-        },
         "robotProvisionerURI": "https://dsfdev.blob.core.windows.net/dsfdev/scripts/ModernRobotProvisioning.exe",
         "robotProvisionerName": "ModernRobotProvisioning.exe",
         "robotProvisionerCMD": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ./', variables('robotProvisionerName'),' ','-u ',parameters('adminusername'),' -r ',variables('vmName'))]"
@@ -194,12 +172,12 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('pmVM')[parameters('environment')].virtualMachineSize]"
+                    "vmSize": "Standard_B4ms"
                 },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
-                        "diskSizeGB": "[variables('pmVM')[parameters('environment')].diskSizeGB]",
+                       "diskSizeGB": "128",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
