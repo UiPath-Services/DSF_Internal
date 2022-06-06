@@ -14,18 +14,6 @@
                 "description": "VMs Admin password"
             }
         },
-        "environment": {
-            "defaultValue": "POV",
-            "allowedValues": [
-                "POV",
-                "PILOT",
-                "BOOTCAMP"
-            ],
-            "type": "String",
-            "metadata": {
-                "description": "Resources size based on environment type"
-            }
-        },
         "location": {
             "defaultValue": "eastus",
             "allowedValues": [
@@ -34,6 +22,8 @@
                 "centralus",
                 "centralindia",
                 "japaneast"
+							   
+						   
             ],
             "type": "String",
             "metadata": {
@@ -54,30 +44,16 @@
         "subnetName": "[concat(variables('virtualNetworkName'), '-subnet')]",
         "networkSecurityGroupName": "default-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-        "imageName": "DSF-GSE",
-        "galleryName": "DSF_POC",
-        "imageVersion": "1.1.1",
-        "imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','DSF-Presales-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+       "imageName": "dsf_partner",
+        "galleryName": "dsf_images",
+        "imageVersion": "1.4.0",
+        "imageRef": "[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "scriptUriBase": "https://raw.githubusercontent.com//UiPath-Services/DSF_Internal/main/Scripts/bootstrap-external.ps1",
         "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
         "scriptFileString": "[variables('scriptUriNamePieces')[sub(length(variables('scriptUriNamePieces')), 1)]]",
         "scriptFileBreakString": "[split(variables('scriptFileString'), '?')]",
         "scriptFileName": "[variables('scriptFileBreakString')[0]]",
         "configureVM": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ', variables('scriptFileName'))]",
-        "pmVM": {
-            "POV": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "PILOT": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "BOOTCAMP": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            }
-        },
         "robotProvisionerURI": "https://dsfdev.blob.core.windows.net/dsfdev/scripts/ModernRobotProvisioning.exe",
         "robotProvisionerName": "ModernRobotProvisioning.exe",
         "robotProvisionerCMD": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ./', variables('robotProvisionerName'),' ','-u ',parameters('adminusername'),' -r ',variables('vmName'))]"
@@ -196,12 +172,12 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('pmVM')[parameters('environment')].virtualMachineSize]"
+                    "vmSize": "Standard_B4ms"
                 },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
-                        "diskSizeGB": "[variables('pmVM')[parameters('environment')].diskSizeGB]",
+                       "diskSizeGB": "128",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
