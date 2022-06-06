@@ -2,120 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "defaultValue": "[resourceGroup().location]",
-            "type": "String",
-            "metadata": {
-                "description": "Location for all resources."
-            }
-        },
-        "automationSuiteVersion": {
-            "type": "string",
-            "defaultValue": "2022.4.0",
-            "allowedValues": [
-                "2022.4.0"
-            ],
-            "metadata": {
-                "description": "Version of UiPath Automation Suite to be installed."
-            }
-        },
-        "RunAutomationSuiteInstall": {
-            "type": "bool",
-            "defaultValue": true,
-            "metadata": {
-                "description": "Flag which determines whether the full service fabric install(infrastructure, fabric, services) will be performed after the infrastructure is provisioned."
-            }
-        },
-        "acceptLicenseAgreement": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Use of paid UiPath products and services is subject to the licensing agreement executed between you and UiPath. \n Unless otherwise indicated by UiPath, use of free UiPath products is subject to the associated licensing agreement available here: https://www.uipath.com/legal/trust-and-security/legal-terms (or successor website).\n By setting the argument acceptLicenseAgreement as true, you agree to the applicable licensing agreement."
-            }
-        },
-        "dnsLoadBalancer": {
-            "type": "string",
-            "defaultValue": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
-            "metadata": {
-                "description": "Domain prefix for the azure load balancer. It needs to be unique, to have only case letters or numbers and to start with a letter."
-            }
-        },
-        "virtualNetworkNewOrExisting": {
-            "type": "string",
-            "defaultValue": "new",
-            "allowedValues": [
-                "new",
-                "existing"
-            ],
-            "metadata": {
-                "description": "Parameter indicating whether the Virtual Network used for the deployment should be created or it's already existing."
-            }
-        },
-        "existingVirtualNetworkResourceGroup": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Resource group where the existing Virtual Network you want to use is deployed. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "existingVirtualNetworkName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of the existing Virtual Network used for deployment. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "existingSubnetName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of an existing subnet inside the above mentioned Virtual Network. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "deployBastionHost": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                true,
-                false
-            ],
-            "metadata": {
-                "description": "Deploy a Bastion Host in the Virtual Network. Parameter used only if Virtual Network New Or Existing is set to new."
-            }
-        },
-        "enableCustomDomain": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Please set to true if you want to use your own custom domain. The needs post-install configuration. Check documentation: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
-            }
-        },
-        "customDomain": {
-            "type": "string",
-            "defaultValue": "replace.with.valid.if.enabled",
-            "metadata": {
-                "description": "Only required if custom domain is enabled. Custom domain for the cluster. Needs to be configured post-installation. It needs to be a valid domain name."
-            }
-        },
-        "enableCustomCertificates": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Please set to true if you want to use your own custom certificates for your own custom domain. Please check documentation for certificate requirements: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
-            }
-        },
+    
         "customServerCertificate": {
             "type": "string",
             "defaultValue": "Replace with valid base 64 server cert if enabled",
@@ -439,9 +326,9 @@
             "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/continueInstallServer.sh",
             "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/validateFullInstall.sh"
         },
-        "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
+        "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', '2022.4.0','/installer-','2022.4.0','.zip')]",
         "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
-        "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
+        "baseName": "[substring([concat('u',uniqueString(resourceGroup().id, deployment().name))], 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
         "storageDeploymentName": "[concat('Storage-',substring(uniqueString(variables('baseName')),0,6))]",
@@ -452,7 +339,7 @@
         "databaseDeploymentName": "[concat('Database-',substring(uniqueString(variables('baseName')),0,6))]",
         "computeDeploymentName": "[concat('Compute-',substring(uniqueString(variables('baseName')),0,6))]",
         "certificateConfig": {
-            "enableCustomCertificates": "[parameters('enableCustomCertificates')]",
+            "enableCustomCertificates": "[bool('false')]",
             "customServerCertificate": "[parameters('customServerCertificate')]",
             "customServerCertKey": "[parameters('customServerCertKey')]",
             "customServerCertAuthorityBundle": "[parameters('customServerCertAuthorityBundle')]"
@@ -623,16 +510,16 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "virtualNetworkNewOrExisting": {
-                        "value": "[parameters('virtualNetworkNewOrExisting')]"
+                        "value": "new"
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
+                        "value": ""
                     },
                     "existingVirtualNetworkName": {
-                        "value": "[parameters('existingVirtualNetworkName')]"
+                        "value": ""
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -671,10 +558,10 @@
                         "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "fqdn": {
-                        "value": "[parameters('dnsLoadBalancer')]"
+                        "value": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]"
                     },
                     "acceptLicenseAgreement": {
-                        "value": "[parameters('acceptLicenseAgreement')]"
+                        "value": true
                     },
                     "actionCenterInstallFlag": {
                         "value": "[parameters('actionCenterInstallFlag')]"
@@ -748,7 +635,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -773,10 +660,10 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "SQLServerName": {
-                        "value": "[concat(substring(parameters('dnsLoadBalancer'),0,4),'sql')]"
+                        "value": "[concat(substring([concat('u',uniqueString(resourceGroup().id, deployment().name))],0,4),'sql')]"
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -818,25 +705,25 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "dnsLoadBalancer": {
-                        "value": "[parameters('dnsLoadBalancer')]"
+                        "value": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]"
                     },
                     "createNewVnet": {
-                        "value": "[if(equals(parameters('virtualNetworkNewOrExisting'), 'new'), bool('true'), bool('false'))]"
+                        "value": "[bool('true')]"
                     },
                     "existingVirtualNetworkName": {
-                        "value": "[parameters('existingVirtualNetworkName')]"
+                        "value": ""
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
+                        "value": ""
                     },
                     "existingSubnetName": {
-                        "value": "[parameters('existingSubnetName')]"
+                        "value": ""
                     },
                     "deployBastionHost": {
-                        "value": "[parameters('deployBastionHost')]"
+                        "value": "[bool('true')]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
@@ -869,7 +756,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "subnetId": {
                         "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
@@ -895,7 +782,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
@@ -925,7 +812,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -1054,10 +941,10 @@
                         "value": "[parameters('documentUnderstandingInstallFlag')]"
                     },
                     "RunAutomationSuiteInstall": {
-                        "value": "[parameters('RunAutomationSuiteInstall')]"
+                        "value": true
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "sqlFQDN": {
                         "value": "[if(variables('existingSQL'),parameters('sqlServerFqdnOrIP'),reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value)]"
@@ -1118,7 +1005,7 @@
             "name": "[variables('postInstallValidationDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "condition": "[parameters('RunAutomationSuiteInstall')]",
+            "condition": true,
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
             ],
@@ -1130,7 +1017,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[resourceGroup().location]"
                     },
                     "storageAccountName": {
                         "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
@@ -1142,10 +1029,10 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerPublicIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "customCertificate": {
-                        "value": "[if(parameters('enableCustomCertificates'), parameters('customServerCertificate'), 'installer-generated')]"
+                        "value": "'installer-generated'"
                     },
                     "scriptUris": {
                         "value": "[variables('scriptUris')]"
@@ -1177,7 +1064,7 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
