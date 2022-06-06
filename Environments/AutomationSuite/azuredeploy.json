@@ -3,41 +3,24 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
     
-        "customServerCertificate": {
+        "automationSuiteVersion": {
             "type": "string",
-            "defaultValue": "Replace with valid base 64 server cert if enabled",
+            "defaultValue": "2022.4.0",
+            "allowedValues": [
+                "2022.4.0"
+            ],
             "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
+                "description": "Version of UiPath Automation Suite to be installed."
             }
         },
-        "customServerCertKey": {
+        "dnsLoadBalancer": {
             "type": "string",
-            "defaultValue": "Replace with valid base 64 server cert key if enabled",
+            "defaultValue": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
             "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate key for the server's TLS connection. The *.KEY file needs to be passed as a base64 encoded string."
+                "description": "Domain prefix for the azure load balancer. It needs to be unique, to have only case letters or numbers and to start with a letter."
             }
         },
-        "customServerCertAuthorityBundle": {
-            "type": "string",
-            "defaultValue": "Replace with valid base 64 public CA bundle cert if enabled",
-            "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate CA bundle for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
-            }
-        },
-        "automationSuiteInstallerURL": {
-            "type": "string",
-            "defaultValue": "None",
-            "metadata": {
-                "description": "The link to the Automation suite installation package. This will overwrite the Automation Suite version parameter. Please keep the default `None` if not used."
-            }
-        },
-        "automationSuiteAdvancedConfig": {
-            "type": "string",
-            "defaultValue": "{}",
-            "metadata": {
-                "description": "This is a valid json string that will be merged in the `cluster_config.json`."
-            }
-        },
+
         "serverNodeCount": {
             "defaultValue": 1,
             "allowedValues": [
@@ -68,17 +51,6 @@
             ],
             "metadata": {
                 "description": "Instance type of a server node"
-            }
-        },
-        "enableUltraDisks": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Enable to use ultra disks for etcd (server nodes). Should only be disabled if the region you are deploying to does not have zones support."
             }
         },
         "agentNodeCount": {
@@ -152,24 +124,6 @@
                 "description": "OPTIONAL: Instance type of the task mining node. This will only be used if you enable task mining."
             }
         },
-        "SQLNewOrExisting": {
-            "type": "string",
-            "defaultValue": "new",
-            "allowedValues": [
-                "new",
-                "existing"
-            ],
-            "metadata": {
-                "description": "Parameter indicating whether the SQL Server used for the deployment should be created or it's already existing."
-            }
-        },
-        "SQLServerFqdnOrIP": {
-            "type": "string",
-            "defaultValue": "Replace with valid fqdn or IP existing SQL is selected",
-            "metadata": {
-                "description": "FQDN or IP associated with the SQL Server. This is only used if the 'SQLNewOrExisting' parameter is set to `existing`"
-            }
-        },
         "SQLServerUsername": {
             "type": "string",
             "defaultValue": "",
@@ -217,17 +171,6 @@
             "defaultValue": "",
             "metadata": {
                 "description": "Virtual Machine User password"
-            }
-        },
-        "enableClusterBackup": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                true,
-                false
-            ],
-            "metadata": {
-                "description": "Deploy the external NFS fileshare. The backup will be enabled at cluster level if the parameter Run Automation Suite Install is set to true."
             }
         },
         "actionCenterInstallFlag": {
@@ -326,9 +269,9 @@
             "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/continueInstallServer.sh",
             "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/validateFullInstall.sh"
         },
-        "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', '2022.4.0','/installer-','2022.4.0','.zip')]",
-        "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
-        "baseName": "[substring([concat('u',uniqueString(resourceGroup().id, deployment().name))], 0, 5)]",
+        "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
+        "automationSuiteInstallerURL": "[variables('URLFromVersion')]",
+        "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
         "storageDeploymentName": "[concat('Storage-',substring(uniqueString(variables('baseName')),0,6))]",
@@ -339,10 +282,10 @@
         "databaseDeploymentName": "[concat('Database-',substring(uniqueString(variables('baseName')),0,6))]",
         "computeDeploymentName": "[concat('Compute-',substring(uniqueString(variables('baseName')),0,6))]",
         "certificateConfig": {
-            "enableCustomCertificates": "[bool('false')]",
-            "customServerCertificate": "[parameters('customServerCertificate')]",
-            "customServerCertKey": "[parameters('customServerCertKey')]",
-            "customServerCertAuthorityBundle": "[parameters('customServerCertAuthorityBundle')]"
+            "enableCustomCertificates": false,
+            "customServerCertificate": "",
+            "customServerCertKey": "",
+            "customServerCertAuthorityBundle": ""
         },
         "enabledServices": {
             "sharedSuite": {
@@ -478,7 +421,7 @@
                 }
             }
         },
-        "existingSQL": "[if(equals(parameters('SqlNewOrExisting'), 'existing'), true(), false())]"
+        "existingSQL": "[false()]"
     },
     "functions": [],
     "resources": [
@@ -558,7 +501,7 @@
                         "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "fqdn": {
-                        "value": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]"
+                        "value": "[parameters('dnsLoadBalancer')]"
                     },
                     "acceptLicenseAgreement": {
                         "value": true
@@ -663,7 +606,7 @@
                         "value": "[resourceGroup().location]"
                     },
                     "SQLServerName": {
-                        "value": "[concat(substring([concat('u',uniqueString(resourceGroup().id, deployment().name))],0,4),'sql')]"
+                        "value": "[concat(substring(parameters('dnsLoadBalancer'),0,4),'sql')]"
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -708,10 +651,10 @@
                         "value": "[resourceGroup().location]"
                     },
                     "dnsLoadBalancer": {
-                        "value": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]"
+                        "value": "[parameters('dnsLoadBalancer')]"
                     },
                     "createNewVnet": {
-                        "value": "[bool('true')]"
+                        "value": true
                     },
                     "existingVirtualNetworkName": {
                         "value": ""
@@ -723,13 +666,13 @@
                         "value": ""
                     },
                     "deployBastionHost": {
-                        "value": "[bool('true')]"
+                        "value": true
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
                     },
                     "enableClusterBackup": {
-                        "value": "[parameters('enableClusterBackup')]"
+                        "value":  true
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -740,7 +683,7 @@
         {
             "name": "[variables('backupDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
-            "condition": "[parameters('enableClusterBackup')]",
+            "condition": true,
             "apiVersion": "2019-10-01",
             "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
             "dependsOn": [
@@ -836,7 +779,7 @@
                         "value": "[parameters('serverNodeInstanceType')]"
                     },
                     "enableUltraDisks": {
-                        "value": "[parameters('enableUltraDisks')]"
+                        "value": true
                     },
                     "agentNodeInstanceType": {
                         "value": "[parameters('agentNodeInstanceType')]"
@@ -947,7 +890,7 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "sqlFQDN": {
-                        "value": "[if(variables('existingSQL'),parameters('sqlServerFqdnOrIP'),reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value)]"
+                        "value": "[reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value]"
                     },
                     "SQLServerPort": {
                         "value": "[if(variables('existingSQL'),parameters('SQLServerPort'),1433)]"
@@ -984,16 +927,16 @@
                         "value": "[variables('automationSuiteInstallerURL')]"
                     },
                     "automationSuiteACRJson": {
-                        "value": "[parameters('automationSuiteAdvancedConfig')]"
+                        "value": "{}"
                     },
                     "enableClusterBackup": {
-                        "value": "[parameters('enableClusterBackup')]"
+                        "value": true
                     },
                     "fileshareEndpoint": {
-                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value, 'none')]"
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value]"
                     },
                     "fileshareMountpath": {
-                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value, 'none')]"
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
