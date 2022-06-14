@@ -13,14 +13,6 @@
                 "description": "Version of UiPath Automation Suite to be installed."
             }
         },
-        "dnsLoadBalancer": {
-            "type": "string",
-            "defaultValue": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
-            "metadata": {
-                "description": "Domain prefix for the azure load balancer. It needs to be unique, to have only case letters or numbers and to start with a letter."
-            }
-        },
-
         "serverNodeCount": {
             "defaultValue": 1,
             "allowedValues": [
@@ -249,6 +241,7 @@
         }
     },
     "variables": {
+        "dnsLoadBalancer": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
         "preValidateTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/preValidate.json",
         "databaseTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/database.json",
         "networkTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/network.json",
@@ -271,7 +264,7 @@
         },
         "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
         "automationSuiteInstallerURL": "[variables('URLFromVersion')]",
-        "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
+        "baseName": "[substring(variables('dnsLoadBalancer'), 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
         "storageDeploymentName": "[concat('Storage-',substring(uniqueString(variables('baseName')),0,6))]",
@@ -501,7 +494,7 @@
                         "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "fqdn": {
-                        "value": "[parameters('dnsLoadBalancer')]"
+                        "value": "[variables('dnsLoadBalancer')]"
                     },
                     "acceptLicenseAgreement": {
                         "value": true
@@ -606,7 +599,7 @@
                         "value": "[resourceGroup().location]"
                     },
                     "SQLServerName": {
-                        "value": "[concat(substring(parameters('dnsLoadBalancer'),0,4),'sql')]"
+                        "value": "[concat(substring(variables('dnsLoadBalancer'),0,4),'sql')]"
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -649,9 +642,6 @@
                 "parameters": {
                     "location": {
                         "value": "[resourceGroup().location]"
-                    },
-                    "dnsLoadBalancer": {
-                        "value": "[parameters('dnsLoadBalancer')]"
                     },
                     "createNewVnet": {
                         "value": true
