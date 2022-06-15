@@ -3,13 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "version": {
-            "defaultValue": "20.10.2",
+            "defaultValue": "22.4.1",
             "allowedValues": [
                 "0.0.0",
-                "19.10.21",
-		"20.10.2",
-                "21.4.3",
-		"21.10.2"
+		"20.10.6",
+                "21.10.4",
+		"22.41.1"
             ],
             "type": "String",
             "metadata": {
@@ -58,9 +57,9 @@
         "networkSecurityGroupName": "default-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "imageName": "Orchestrator",
-		"galleryName": "ProductSupport",
+		"galleryName": "SupportTestImages",
         "imageVersion": "[parameters('version')]",
-		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','DevTest-ProductSupport-RG','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																													   
+		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','SupportTestImages','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																													   
         "pmVM":  {
             "POV": {
                 "virtualMachineSize": "Standard_B4ms",
