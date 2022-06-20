@@ -2,7 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-    
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
         "automationSuiteVersion": {
             "type": "string",
             "defaultValue": "2022.4.0",
@@ -11,6 +17,138 @@
             ],
             "metadata": {
                 "description": "Version of UiPath Automation Suite to be installed."
+            }
+        },
+        "RunAutomationSuiteInstall": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Flag which determines whether the full service fabric install(infrastructure, fabric, services) will be performed after the infrastructure is provisioned."
+            }
+        },
+        "acceptLicenseAgreement": {
+            "type": "bool",
+            "defaultValue": false,
+            "allowedValues": [
+                false,
+                true
+            ],
+            "metadata": {
+                "description": "Use of paid UiPath products and services is subject to the licensing agreement executed between you and UiPath. \n Unless otherwise indicated by UiPath, use of free UiPath products is subject to the associated licensing agreement available here: https://www.uipath.com/legal/trust-and-security/legal-terms (or successor website).\n By setting the argument acceptLicenseAgreement as true, you agree to the applicable licensing agreement."
+            }
+        },
+        "dnsLoadBalancer": {
+            "type": "string",
+            "defaultValue": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
+            "metadata": {
+                "description": "Domain prefix for the azure load balancer. It needs to be unique, to have only case letters or numbers and to start with a letter."
+            }
+        },
+        "virtualNetworkNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Parameter indicating whether the Virtual Network used for the deployment should be created or it's already existing."
+            }
+        },
+        "existingVirtualNetworkResourceGroup": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Resource group where the existing Virtual Network you want to use is deployed. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
+            }
+        },
+        "existingVirtualNetworkName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the existing Virtual Network used for deployment. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
+            }
+        },
+        "existingSubnetName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of an existing subnet inside the above mentioned Virtual Network. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
+            }
+        },
+        "deployBastionHost": {
+            "type": "bool",
+            "defaultValue": true,
+            "allowedValues": [
+                true,
+                false
+            ],
+            "metadata": {
+                "description": "Deploy a Bastion Host in the Virtual Network. Parameter used only if Virtual Network New Or Existing is set to new."
+            }
+        },
+        "enableCustomDomain": {
+            "type": "bool",
+            "defaultValue": false,
+            "allowedValues": [
+                false,
+                true
+            ],
+            "metadata": {
+                "description": "Please set to true if you want to use your own custom domain. The needs post-install configuration. Check documentation: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
+            }
+        },
+        "customDomain": {
+            "type": "string",
+            "defaultValue": "replace.with.valid.if.enabled",
+            "metadata": {
+                "description": "Only required if custom domain is enabled. Custom domain for the cluster. Needs to be configured post-installation. It needs to be a valid domain name."
+            }
+        },
+        "enableCustomCertificates": {
+            "type": "bool",
+            "defaultValue": false,
+            "allowedValues": [
+                false,
+                true
+            ],
+            "metadata": {
+                "description": "Please set to true if you want to use your own custom certificates for your own custom domain. Please check documentation for certificate requirements: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
+            }
+        },
+        "customServerCertificate": {
+            "type": "string",
+            "defaultValue": "Replace with valid base 64 server cert if enabled",
+            "metadata": {
+                "description": "Only required if custom certificates are enabled. Custom certificate for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
+            }
+        },
+        "customServerCertKey": {
+            "type": "string",
+            "defaultValue": "Replace with valid base 64 server cert key if enabled",
+            "metadata": {
+                "description": "Only required if custom certificates are enabled. Custom certificate key for the server's TLS connection. The *.KEY file needs to be passed as a base64 encoded string."
+            }
+        },
+        "customServerCertAuthorityBundle": {
+            "type": "string",
+            "defaultValue": "Replace with valid base 64 public CA bundle cert if enabled",
+            "metadata": {
+                "description": "Only required if custom certificates are enabled. Custom certificate CA bundle for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
+            }
+        },
+        "automationSuiteInstallerURL": {
+            "type": "string",
+            "defaultValue": "None",
+            "metadata": {
+                "description": "The link to the Automation suite installation package. This will overwrite the Automation Suite version parameter. Please keep the default `None` if not used."
+            }
+        },
+        "automationSuiteAdvancedConfig": {
+            "type": "string",
+            "defaultValue": "{}",
+            "metadata": {
+                "description": "This is a valid json string that will be merged in the `cluster_config.json`."
             }
         },
         "serverNodeCount": {
@@ -43,6 +181,17 @@
             ],
             "metadata": {
                 "description": "Instance type of a server node"
+            }
+        },
+        "enableUltraDisks": {
+            "type": "bool",
+            "defaultValue": true,
+            "allowedValues": [
+                false,
+                true
+            ],
+            "metadata": {
+                "description": "Enable to use ultra disks for etcd (server nodes). Should only be disabled if the region you are deploying to does not have zones support."
             }
         },
         "agentNodeCount": {
@@ -116,6 +265,24 @@
                 "description": "OPTIONAL: Instance type of the task mining node. This will only be used if you enable task mining."
             }
         },
+        "SQLNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Parameter indicating whether the SQL Server used for the deployment should be created or it's already existing."
+            }
+        },
+        "SQLServerFqdnOrIP": {
+            "type": "string",
+            "defaultValue": "Replace with valid fqdn or IP existing SQL is selected",
+            "metadata": {
+                "description": "FQDN or IP associated with the SQL Server. This is only used if the 'SQLNewOrExisting' parameter is set to `existing`"
+            }
+        },
         "SQLServerUsername": {
             "type": "string",
             "defaultValue": "",
@@ -163,6 +330,17 @@
             "defaultValue": "",
             "metadata": {
                 "description": "Virtual Machine User password"
+            }
+        },
+        "enableClusterBackup": {
+            "type": "bool",
+            "defaultValue": true,
+            "allowedValues": [
+                true,
+                false
+            ],
+            "metadata": {
+                "description": "Deploy the external NFS fileshare. The backup will be enabled at cluster level if the parameter Run Automation Suite Install is set to true."
             }
         },
         "actionCenterInstallFlag": {
@@ -241,31 +419,43 @@
         }
     },
     "variables": {
-        "dnsLoadBalancer": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
-        "preValidateTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/preValidate.json",
-        "databaseTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/database.json",
-        "networkTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/network.json",
-        "backupTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/backup.json",
-        "computeTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/compute.json",
-        "dnsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/dns.json",
-        "vaultTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/vault.json",
-        "storageTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/storage.json",
-        "postInstallValidationTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/LinkedTemplates/postInstallValidation.json",
+        "preValidateTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/preValidate.json",
+        "automationsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/automations.json",
+        "databaseTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/database.json",
+        "networkTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/network.json",
+        "backupTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/backup.json",
+        "computeTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/compute.json",
+        "dnsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/dns.json",
+        "vaultTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/vault.json",
+        "storageTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/storage.json",
+        "postInstallValidationTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/postInstallValidation.json",
         "scriptUris": {
-            "validateDeploymentParameters": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/validateDeploymentParameters.ps1",
-            "diskResize": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/diskresize.sh",
-            "installPrereq": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/installPrereq.sh",
-            "installServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/installServer.sh",
-            "installAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/installAgent.sh",
-            "installGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/installGpuAgent.sh",
-            "continueInstallGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/continueInstallGpuAgent.sh",
-            "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/continueInstallServer.sh",
-            "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.0/scripts/validateFullInstall.sh"
+            "validateDeploymentParameters": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/validateDeploymentParameters.ps1",
+            "diskResize": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/diskresize.sh",
+            "installPrereq": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installPrereq.sh",
+            "installServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installServer.sh",
+            "installAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installAgent.sh",
+            "installGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installGpuAgent.sh",
+            "continueInstallGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/continueInstallGpuAgent.sh",
+            "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/continueInstallServer.sh",
+            "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/validateFullInstall.sh",
+            "removeNode": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/removeNode.sh",
+            "instanceTermination": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/instanceTermination.sh"
+        },
+        "runbookScriptUris": {
+            "removeNode": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/removeNode.sh",
+            "removeNodesRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaRemoveNodes.ps1",
+            "removeServersRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaRemoveServers.ps1",
+            "instanceRefreshRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaInstanceRefresh.ps1",
+            "importModulesRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaImportModules.ps1",
+            "checkServerZoneResilience": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaCheckServerZoneResilience.ps1",
+            "removeNodeUtils": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/ASNodeRemoveUtils.zip"
         },
         "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
-        "automationSuiteInstallerURL": "[variables('URLFromVersion')]",
-        "baseName": "[substring(variables('dnsLoadBalancer'), 0, 5)]",
+        "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
+        "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
+        "automationsDeploymentName": "[concat('automations-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
         "storageDeploymentName": "[concat('Storage-',substring(uniqueString(variables('baseName')),0,6))]",
         "postInstallValidationDeploymentName": "[concat('PostInstallValidation-',substring(uniqueString(variables('baseName')),0,6))]",
@@ -275,10 +465,10 @@
         "databaseDeploymentName": "[concat('Database-',substring(uniqueString(variables('baseName')),0,6))]",
         "computeDeploymentName": "[concat('Compute-',substring(uniqueString(variables('baseName')),0,6))]",
         "certificateConfig": {
-            "enableCustomCertificates": false,
-            "customServerCertificate": "",
-            "customServerCertKey": "",
-            "customServerCertAuthorityBundle": ""
+            "enableCustomCertificates": "[parameters('enableCustomCertificates')]",
+            "customServerCertificate": "[parameters('customServerCertificate')]",
+            "customServerCertKey": "[parameters('customServerCertKey')]",
+            "customServerCertAuthorityBundle": "[parameters('customServerCertAuthorityBundle')]"
         },
         "enabledServices": {
             "sharedSuite": {
@@ -414,7 +604,7 @@
                 }
             }
         },
-        "existingSQL": "[false()]"
+        "existingSQL": "[if(equals(parameters('SqlNewOrExisting'), 'existing'), true(), false())]"
     },
     "functions": [],
     "resources": [
@@ -446,16 +636,16 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "virtualNetworkNewOrExisting": {
-                        "value": "new"
+                        "value": "[parameters('virtualNetworkNewOrExisting')]"
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": ""
+                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
                     },
                     "existingVirtualNetworkName": {
-                        "value": ""
+                        "value": "[parameters('existingVirtualNetworkName')]"
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -494,10 +684,10 @@
                         "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "fqdn": {
-                        "value": "[variables('dnsLoadBalancer')]"
+                        "value": "[parameters('dnsLoadBalancer')]"
                     },
                     "acceptLicenseAgreement": {
-                        "value": true
+                        "value": "[parameters('acceptLicenseAgreement')]"
                     },
                     "actionCenterInstallFlag": {
                         "value": "[parameters('actionCenterInstallFlag')]"
@@ -571,7 +761,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -596,10 +786,10 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "SQLServerName": {
-                        "value": "[concat(substring(variables('dnsLoadBalancer'),0,4),'sql')]"
+                        "value": "[concat(substring(parameters('dnsLoadBalancer'),0,4),'sql')]"
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -641,28 +831,31 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
+                    },
+                    "dnsLoadBalancer": {
+                        "value": "[parameters('dnsLoadBalancer')]"
                     },
                     "createNewVnet": {
-                        "value": true
+                        "value": "[if(equals(parameters('virtualNetworkNewOrExisting'), 'new'), bool('true'), bool('false'))]"
                     },
                     "existingVirtualNetworkName": {
-                        "value": ""
+                        "value": "[parameters('existingVirtualNetworkName')]"
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": ""
+                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
                     },
                     "existingSubnetName": {
-                        "value": ""
+                        "value": "[parameters('existingSubnetName')]"
                     },
                     "deployBastionHost": {
-                        "value": true
+                        "value": "[parameters('deployBastionHost')]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
                     },
                     "enableClusterBackup": {
-                        "value":  true
+                        "value": "[parameters('enableClusterBackup')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -673,7 +866,7 @@
         {
             "name": "[variables('backupDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
-            "condition": true,
+            "condition": "[parameters('enableClusterBackup')]",
             "apiVersion": "2019-10-01",
             "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
             "dependsOn": [
@@ -689,7 +882,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "subnetId": {
                         "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
@@ -715,7 +908,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
@@ -745,7 +938,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -769,7 +962,7 @@
                         "value": "[parameters('serverNodeInstanceType')]"
                     },
                     "enableUltraDisks": {
-                        "value": true
+                        "value": "[parameters('enableUltraDisks')]"
                     },
                     "agentNodeInstanceType": {
                         "value": "[parameters('agentNodeInstanceType')]"
@@ -874,13 +1067,13 @@
                         "value": "[parameters('documentUnderstandingInstallFlag')]"
                     },
                     "RunAutomationSuiteInstall": {
-                        "value": true
+                        "value": "[parameters('RunAutomationSuiteInstall')]"
                     },
                     "clusterFQDN": {
-                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
                     },
                     "sqlFQDN": {
-                        "value": "[reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value]"
+                        "value": "[if(variables('existingSQL'),parameters('sqlServerFqdnOrIP'),reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value)]"
                     },
                     "SQLServerPort": {
                         "value": "[if(variables('existingSQL'),parameters('SQLServerPort'),1433)]"
@@ -917,16 +1110,16 @@
                         "value": "[variables('automationSuiteInstallerURL')]"
                     },
                     "automationSuiteACRJson": {
-                        "value": "{}"
+                        "value": "[parameters('automationSuiteAdvancedConfig')]"
                     },
                     "enableClusterBackup": {
-                        "value": true
+                        "value": "[parameters('enableClusterBackup')]"
                     },
                     "fileshareEndpoint": {
-                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value]"
+                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value, 'none')]"
                     },
                     "fileshareMountpath": {
-                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value]"
+                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value, 'none')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -938,9 +1131,10 @@
             "name": "[variables('postInstallValidationDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "condition": true,
+            "condition": "[parameters('RunAutomationSuiteInstall')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
+                "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('automationsDeploymentName'))]"
             ],
             "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
             "properties": {
@@ -950,7 +1144,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[resourceGroup().location]"
+                        "value": "[parameters('location')]"
                     },
                     "storageAccountName": {
                         "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
@@ -962,10 +1156,16 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerPublicIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
                     },
                     "customCertificate": {
-                        "value": "'installer-generated'"
+                        "value": "[if(parameters('enableCustomCertificates'), parameters('customServerCertificate'), 'installer-generated')]"
+                    },
+                    "automationAccount": {
+                        "value": "[reference(variables('automationsDeploymentName')).outputs.automationAccount.value]"
+                    },
+                    "msiName": {
+                        "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "scriptUris": {
                         "value": "[variables('scriptUris')]"
@@ -997,10 +1197,57 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('automationsDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
+            ],
+            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('automationsTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "msiClientId": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.msiClientId.value]"
+                    },
+                    "ServerVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.ServerVMSSName.value]"
+                    },
+                    "AgentVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.AgentVMSSName.value]"
+                    },
+                    "GpuVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.GpuVMSSName.value]"
+                    },
+                    "BaseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
+                    },
+                    "storageContainerName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.containerName.value]"
+                    },
+                    "scriptUris": {
+                        "value": "[variables('runbookScriptUris')]"
+                    },
+                    "moduleUris": {
+                        "value": "[variables('runbookScriptUris')]"
                     }
                 }
             }
