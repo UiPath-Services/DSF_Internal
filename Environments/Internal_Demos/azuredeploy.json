@@ -25,7 +25,7 @@
             ],
             "type": "String",
             "metadata": {
-                "description": "Resources location"
+                "description": "Resource location"
             }
         }
     },
