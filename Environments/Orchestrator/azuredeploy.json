@@ -183,7 +183,16 @@
                },
                "imageReference":{
                   "id":"[variables('imageRef')]"
-               },
+               }
+            },
+            "networkProfile":{
+               "networkInterfaces":[
+                  {
+                     "id":"[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                  }
+               ]
+            },
+            
                "osProfile":{
                   "computerName":"[variables('vmName')]",
                   "adminusername":"admin_1",
@@ -193,14 +202,6 @@
                      "provisionVmAgent":true
                   }
                }
-            },
-            "networkProfile":{
-               "networkInterfaces":[
-                  {
-                     "id":"[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
-                  }
-               ]
-            }
          },
          "dependsOn":[
             "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
