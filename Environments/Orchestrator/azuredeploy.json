@@ -193,16 +193,7 @@
                ]
             },
             
-               "osProfile":{
-                  "computerName":"[variables('vmName')]",
-                  "adminusername":"admin_1",
-                  "adminpassword":"1!Nought-roy-ripoff",
-                  "windowsConfiguration":{
-                     "enableAutomaticUpdates":false,
-                     "provisionVmAgent":true
-                  }
-               }
-         },
+             
          "dependsOn":[
             "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
          ]
