@@ -1,3 +1,5 @@
+
+
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
@@ -15,27 +17,11 @@
                 "description": "Orchestrator Version"
             }
         },
-        "environment": {
-            "defaultValue": "POV",
-            "allowedValues": [
-                "POV",
-                "PILOT",
-                "BOOTCAMP"
-            ],
-            "type": "String",
-            "metadata": {
-                "description": "Resources size based on environment type"
-            }
-        },
+						  						 					 											   		  
         "location": {
-            "defaultValue": "westeurope",
+            "defaultValue": "eastus",
             "allowedValues": [
-                "eastus",
-                "westeurope",
-                "northeurope",
-                "centralus",
-                "centralindia",
-                "australiaeast"
+                "eastus"
             ],
             "type": "String",
             "metadata": {
@@ -59,21 +45,16 @@
         "imageName": "Orchestrator",
 		"galleryName": "SupportTestImages",
         "imageVersion": "[parameters('version')]",
-		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','SupportTestImages','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",																													   
-        "pmVM":  {
-            "POV": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "PILOT": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            },
-            "BOOTCAMP": {
-                "virtualMachineSize": "Standard_B4ms",
-                "diskSizeGB": 128
-            }
-        }																																																													
+		"imageRef": "[resourceId('e6890ad9-401e-4696-bee4-c50fe72aa287','SupportTestImages','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]"								
+																																																						
+																		  
+																																																			
+																			   
+																	
+																													   
+																												 
+															  
+																																																	   
     },
     "resources": [
         {
@@ -202,12 +183,13 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('pmVM')[parameters('environment')].virtualMachineSize]"
-                },
+                    "vmSize": "Standard_B4ms"
+ },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
-                        "diskSizeGB": "[variables('pmVM')[parameters('environment')].diskSizeGB]",
+                       "diskSizeGB": "128",
+
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
@@ -222,13 +204,12 @@
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                         }
-                    ]
-		 
+                    ]															 
                 }
             },
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
-            ]	 
+            ]	 																						 		 
         }
     ],
       "outputs": {
@@ -246,3 +227,4 @@
         }
     }
 }
+							
