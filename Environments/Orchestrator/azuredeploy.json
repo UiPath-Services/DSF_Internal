@@ -191,9 +191,8 @@
                      "id":"[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                   }
                ]
-            },
-            
-             
+            }
+         },
          "dependsOn":[
             "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
          ]
