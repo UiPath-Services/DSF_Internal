@@ -183,6 +183,13 @@
                 "description": "Instance type of a server node"
             }
         },
+        "serverNodeHostname": {
+            "type": "string",
+            "defaultValue": "uipath-server-",
+            "metadata": {
+                "description": "Server node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
+            }
+        },
         "enableUltraDisks": {
             "type": "bool",
             "defaultValue": true,
@@ -224,6 +231,13 @@
                 "description": "Instance type of an agent node"
             }
         },
+        "agentNodeHostname": {
+            "type": "string",
+            "defaultValue": "uipath-ag-",
+            "metadata": {
+                "description": "Agent node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
+            }
+        },
         "gpuNodeCount": {
             "type": "int",
             "defaultValue": 0,
@@ -253,6 +267,13 @@
                 "description": "Instance type of a gpu agent node"
             }
         },
+        "gpuNodeHostname": {
+            "type": "string",
+            "defaultValue": "uipath-gp-",
+            "metadata": {
+                "description": "GPU node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
+            }
+        },
         "taskMiningNodeType": {
             "type": "string",
             "defaultValue": "Standard_D32s_v3",
@@ -263,6 +284,13 @@
             ],
             "metadata": {
                 "description": "OPTIONAL: Instance type of the task mining node. This will only be used if you enable task mining."
+            }
+        },
+        "taskMiningNodeHostname": {
+            "type": "string",
+            "defaultValue": "uipath-tm",
+            "metadata": {
+                "description": "Task mining node hostname/computer name."
             }
         },
         "SQLNewOrExisting": {
@@ -419,38 +447,88 @@
         }
     },
     "variables": {
-        "preValidateTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/preValidate.json",
-        "automationsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/automations.json",
-        "databaseTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/database.json",
-        "networkTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/network.json",
-        "backupTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/backup.json",
-        "computeTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/compute.json",
-        "dnsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/dns.json",
-        "vaultTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/vault.json",
-        "storageTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/storage.json",
-        "postInstallValidationTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/LinkedTemplates/postInstallValidation.json",
+        "preValidateTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/preValidate.json",
+        "automationsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/automations.json",
+        "databaseTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/database.json",
+        "networkTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/network.json",
+        "backupTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/backup.json",
+        "computeTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/compute.json",
+        "dnsTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/dns.json",
+        "vaultTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/vault.json",
+        "storageTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/storage.json",
+        "postInstallValidationTemplateUri": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/LinkedTemplates/postInstallValidation.json",
+        "removeNodeUtilsUrl": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/ASNodeRemoveUtils.zip",
+        "removeNodeScriptUrl": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/removeNode.sh",
         "scriptUris": {
-            "validateDeploymentParameters": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/validateDeploymentParameters.ps1",
-            "diskResize": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/diskresize.sh",
-            "installPrereq": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installPrereq.sh",
-            "installServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installServer.sh",
-            "installAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installAgent.sh",
-            "installGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/installGpuAgent.sh",
-            "continueInstallGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/continueInstallGpuAgent.sh",
-            "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/continueInstallServer.sh",
-            "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/validateFullInstall.sh",
-            "removeNode": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/removeNode.sh",
-            "instanceTermination": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/instanceTermination.sh"
+            "validateDeploymentParameters": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/validateDeploymentParameters.ps1",
+            "diskResize": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/diskresize.sh",
+            "installPrereq": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/installPrereq.sh",
+            "installServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/installServer.sh",
+            "installAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/installAgent.sh",
+            "installGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/installGpuAgent.sh",
+            "continueInstallGpuAgent": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/continueInstallGpuAgent.sh",
+            "continueInstallServer": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/continueInstallServer.sh",
+            "validateFullInstall": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/validateFullInstall.sh",
+            "removeNode": "[variables('removeNodeScriptUrl')]",
+            "instanceTermination": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/instanceTermination.sh"
         },
-        "runbookScriptUris": {
-            "removeNode": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/removeNode.sh",
-            "removeNodesRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaRemoveNodes.ps1",
-            "removeServersRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaRemoveServers.ps1",
-            "instanceRefreshRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaInstanceRefresh.ps1",
-            "importModulesRunbook": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaImportModules.ps1",
-            "checkServerZoneResilience": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/aaCheckServerZoneResilience.ps1",
-            "removeNodeUtils": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.1/scripts/ASNodeRemoveUtils.zip"
+        "scriptsAndModulesObject": {
+            "runbookScripts": [
+                {
+                    "name": "InstanceRefresh",
+                    "url": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/aaInstanceRefresh.ps1",
+                    "version": "1.0.0.0",
+                    "type": "PowerShell",
+                    "description": "Runbook to perform instance refresh on an Automation Suite cluster."
+                },
+                {
+                    "name": "RemoveServers",
+                    "url": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/aaRemoveServers.ps1",
+                    "version": "1.0.0.0",
+                    "type": "PowerShell",
+                    "description": "Runbook to perform server removal from the Automation Suite cluster."
+                },
+                {
+                    "name": "RemoveNodes",
+                    "url": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/aaRemoveNodes.ps1",
+                    "version": "1.0.0.0",
+                    "type": "PowerShell",
+                    "description": "Runbook to perform specific node removal from the Automation Suite cluster."
+                },
+                {
+                    "name": "ImportASModules",
+                    "url": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/aaImportModules.ps1",
+                    "version": "1.0.0.0",
+                    "type": "PowerShell",
+                    "description": "Runbook to import the modules needed by the Automation Suite runbooks."
+                },
+                {
+                    "name": "CheckServerZoneResilience",
+                    "url": "https://download.uipath.com/templates/AutomationSuite/Azure/2022.4.3/scripts/aaCheckServerZoneResilience.ps1",
+                    "version": "1.0.0.0",
+                    "type": "PowerShell",
+                    "description": "Runbook to check the server zone resilience and tries to distribute a node to other Availability Zone if needed."
+                }
+            ],
+            "modules": [
+                {
+                    "name": "removeNodeUtils",
+                    "url": "[variables('removeNodeUtilsUrl')]"
+                }
+            ]
         },
+        "automationAccountAdditionalVariables": [
+            {
+                "name": "removeNodeScriptURL",
+                "description": "URL of the script used to remove a node from Automation Suite Cluster",
+                "value": "[concat('\"', variables('removeNodeScriptUrl'), '\"')]"
+            },
+            {
+                "name": "removeNodeUtilsURL",
+                "description": "URL of the utils module used to remove a node from Automation Suite Cluster",
+                "value": "[concat('\"', variables('removeNodeUtilsUrl'), '\"')]"
+            }
+        ],
         "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
         "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
         "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
@@ -604,7 +682,10 @@
                 }
             }
         },
-        "existingSQL": "[if(equals(parameters('SqlNewOrExisting'), 'existing'), true(), false())]"
+        "existingSQL": "[if(equals(parameters('SqlNewOrExisting'), 'existing'), true(), false())]",
+        "templateVersionTag": {
+            "templateVersion": "22.4.3"
+        }
     },
     "functions": [],
     "resources": [
@@ -719,6 +800,9 @@
                     "documentUnderstandingInstallFlag": {
                         "value": "[parameters('documentUnderstandingInstallFlag')]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -762,6 +846,9 @@
                     },
                     "location": {
                         "value": "[parameters('location')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -810,6 +897,9 @@
                     "dbNames": {
                         "value": "[reference(variables('preChecksDeploymentName')).outputs.dbNames.value]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -857,6 +947,9 @@
                     "enableClusterBackup": {
                         "value": "[parameters('enableClusterBackup')]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -887,6 +980,9 @@
                     "subnetId": {
                         "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -912,6 +1008,9 @@
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -951,6 +1050,18 @@
                     },
                     "serverNodeCount": {
                         "value": "[parameters('serverNodeCount')]"
+                    },
+                    "serverNodeHostname": {
+                        "value": "[parameters('serverNodeHostname')]"
+                    },
+                    "agentNodeHostname": {
+                        "value": "[parameters('agentNodeHostname')]"
+                    },
+                    "gpuNodeHostname": {
+                        "value": "[parameters('gpuNodeHostname')]"
+                    },
+                    "taskMiningNodeHostName": {
+                        "value": "[parameters('taskMiningNodeHostName')]"
                     },
                     "agentNodeCount": {
                         "value": "[parameters('agentNodeCount')]"
@@ -1121,6 +1232,9 @@
                     "fileshareMountpath": {
                         "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value, 'none')]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -1170,6 +1284,9 @@
                     "scriptUris": {
                         "value": "[variables('scriptUris')]"
                     },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
                     }
@@ -1198,6 +1315,9 @@
                     },
                     "clusterFQDN": {
                         "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
                         "value": "[parameters('tagsByResource')]"
@@ -1243,11 +1363,17 @@
                     "storageContainerName": {
                         "value": "[reference(variables('storageDeploymentName')).outputs.containerName.value]"
                     },
-                    "scriptUris": {
-                        "value": "[variables('runbookScriptUris')]"
+                    "scriptsAndModulesObject": {
+                        "value": "[variables('scriptsAndModulesObject')]"
                     },
-                    "moduleUris": {
-                        "value": "[variables('runbookScriptUris')]"
+                    "automationAccountAdditionalVariables": {
+                        "value": "[variables('automationAccountAdditionalVariables')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[parameters('tagsByResource')]"
                     }
                 }
             }
