@@ -2,169 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "defaultValue": "[resourceGroup().location]",
-            "type": "String",
-            "metadata": {
-                "description": "Location for all resources."
-            }
-        },
-        "automationSuiteVersion": {
-            "type": "string",
-            "defaultValue": "2022.4.0",
-            "allowedValues": [
-                "2022.4.0"
-            ],
-            "metadata": {
-                "description": "Version of UiPath Automation Suite to be installed."
-            }
-        },
-        "RunAutomationSuiteInstall": {
-            "type": "bool",
-            "defaultValue": true,
-            "metadata": {
-                "description": "Flag which determines whether the full service fabric install(infrastructure, fabric, services) will be performed after the infrastructure is provisioned."
-            }
-        },
-        "acceptLicenseAgreement": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Use of paid UiPath products and services is subject to the licensing agreement executed between you and UiPath. \n Unless otherwise indicated by UiPath, use of free UiPath products is subject to the associated licensing agreement available here: https://www.uipath.com/legal/trust-and-security/legal-terms (or successor website).\n By setting the argument acceptLicenseAgreement as true, you agree to the applicable licensing agreement."
-            }
-        },
-        "dnsLoadBalancer": {
-            "type": "string",
-            "defaultValue": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
-            "metadata": {
-                "description": "Domain prefix for the azure load balancer. It needs to be unique, to have only case letters or numbers and to start with a letter."
-            }
-        },
-        "virtualNetworkNewOrExisting": {
-            "type": "string",
-            "defaultValue": "new",
-            "allowedValues": [
-                "new",
-                "existing"
-            ],
-            "metadata": {
-                "description": "Parameter indicating whether the Virtual Network used for the deployment should be created or it's already existing."
-            }
-        },
-        "existingVirtualNetworkResourceGroup": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Resource group where the existing Virtual Network you want to use is deployed. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "existingVirtualNetworkName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of the existing Virtual Network used for deployment. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "existingSubnetName": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Name of an existing subnet inside the above mentioned Virtual Network. Parameter used only if the parameter Virtual Network New Or Existing is set to existing."
-            }
-        },
-        "deployBastionHost": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                true,
-                false
-            ],
-            "metadata": {
-                "description": "Deploy a Bastion Host in the Virtual Network. Parameter used only if Virtual Network New Or Existing is set to new."
-            }
-        },
-        "enableCustomDomain": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Please set to true if you want to use your own custom domain. The needs post-install configuration. Check documentation: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
-            }
-        },
-        "customDomain": {
-            "type": "string",
-            "defaultValue": "replace.with.valid.if.enabled",
-            "metadata": {
-                "description": "Only required if custom domain is enabled. Custom domain for the cluster. Needs to be configured post-installation. It needs to be a valid domain name."
-            }
-        },
-        "enableCustomCertificates": {
-            "type": "bool",
-            "defaultValue": false,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Please set to true if you want to use your own custom certificates for your own custom domain. Please check documentation for certificate requirements: https://docs.uipath.com/automation-suite/docs/deploying-automation-suite-to-azure"
-            }
-        },
-        "customServerCertificate": {
-            "type": "string",
-            "defaultValue": "Replace with valid base 64 server cert if enabled",
-            "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
-            }
-        },
-        "customServerCertKey": {
-            "type": "string",
-            "defaultValue": "Replace with valid base 64 server cert key if enabled",
-            "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate key for the server's TLS connection. The *.KEY file needs to be passed as a base64 encoded string."
-            }
-        },
-        "customServerCertAuthorityBundle": {
-            "type": "string",
-            "defaultValue": "Replace with valid base 64 public CA bundle cert if enabled",
-            "metadata": {
-                "description": "Only required if custom certificates are enabled. Custom certificate CA bundle for the server's TLS connection. The *.CRT file needs to be passed as a base64 encoded string."
-            }
-        },
-        "automationSuiteInstallerURL": {
-            "type": "string",
-            "defaultValue": "None",
-            "metadata": {
-                "description": "The link to the Automation suite installation package. This will overwrite the Automation Suite version parameter. Please keep the default `None` if not used."
-            }
-        },
-        "automationSuiteAdvancedConfig": {
-            "type": "string",
-            "defaultValue": "{}",
-            "metadata": {
-                "description": "This is a valid json string that will be merged in the `cluster_config.json`."
-            }
-        },
         "serverNodeCount": {
             "defaultValue": 1,
             "allowedValues": [
                 1,
                 3,
-                5,
-                7,
-                9,
-                11,
-                13,
-                15
+                5
             ],
             "minValue": 1,
-            "maxValue": 15,
+            "maxValue": 5,
             "type": "int",
             "metadata": {
                 "description": "Number of server nodes (? or less). Should be an odd number. If single node ignored?"
@@ -175,44 +21,22 @@
             "defaultValue": "Standard_D16s_v3",
             "allowedValues": [
                 "Standard_D16s_v3",
-                "Standard_D32s_v3",
-                "Standard_F16s_v2",
-                "Standard_F32s_v2"
+                "Standard_D32s_v3"
             ],
             "metadata": {
                 "description": "Instance type of a server node"
-            }
-        },
-        "serverNodeHostname": {
-            "type": "string",
-            "defaultValue": "uipath-server-",
-            "metadata": {
-                "description": "Server node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
-            }
-        },
-        "enableUltraDisks": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                false,
-                true
-            ],
-            "metadata": {
-                "description": "Enable to use ultra disks for etcd (server nodes). Should only be disabled if the region you are deploying to does not have zones support."
             }
         },
         "agentNodeCount": {
             "type": "int",
             "defaultValue": 1,
             "minValue": 0,
-            "maxValue": 5,
+            "maxValue": 3,
             "allowedValues": [
                 0,
                 1,
                 2,
-                3,
-                4,
-                5
+                3
             ],
             "metadata": {
                 "description": "Number of agent nodes (? or less)"
@@ -223,33 +47,21 @@
             "defaultValue": "Standard_D16s_v3",
             "allowedValues": [
                 "Standard_D16s_v3",
-                "Standard_D32s_v3",
-                "Standard_F16s_v2",
-                "Standard_F32s_v2"
+                "Standard_D32s_v3"
             ],
             "metadata": {
                 "description": "Instance type of an agent node"
-            }
-        },
-        "agentNodeHostname": {
-            "type": "string",
-            "defaultValue": "uipath-ag-",
-            "metadata": {
-                "description": "Agent node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
             }
         },
         "gpuNodeCount": {
             "type": "int",
             "defaultValue": 0,
             "minValue": 0,
-            "maxValue": 5,
+            "maxValue": 2,
             "allowedValues": [
                 0,
                 1,
-                2,
-                3,
-                4,
-                5
+                2
             ],
             "metadata": {
                 "description": "Number of agent nodes with GPU capabilities (? or less)"
@@ -267,13 +79,6 @@
                 "description": "Instance type of a gpu agent node"
             }
         },
-        "gpuNodeHostname": {
-            "type": "string",
-            "defaultValue": "uipath-gp-",
-            "metadata": {
-                "description": "GPU node hostname/computer name prefix. Azure will append a sequence described here: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-instance-ids#scale-set-vm-computer-name"
-            }
-        },
         "taskMiningNodeType": {
             "type": "string",
             "defaultValue": "Standard_D32s_v3",
@@ -284,31 +89,6 @@
             ],
             "metadata": {
                 "description": "OPTIONAL: Instance type of the task mining node. This will only be used if you enable task mining."
-            }
-        },
-        "taskMiningNodeHostname": {
-            "type": "string",
-            "defaultValue": "uipath-tm",
-            "metadata": {
-                "description": "Task mining node hostname/computer name."
-            }
-        },
-        "SQLNewOrExisting": {
-            "type": "string",
-            "defaultValue": "new",
-            "allowedValues": [
-                "new",
-                "existing"
-            ],
-            "metadata": {
-                "description": "Parameter indicating whether the SQL Server used for the deployment should be created or it's already existing."
-            }
-        },
-        "SQLServerFqdnOrIP": {
-            "type": "string",
-            "defaultValue": "Replace with valid fqdn or IP existing SQL is selected",
-            "metadata": {
-                "description": "FQDN or IP associated with the SQL Server. This is only used if the 'SQLNewOrExisting' parameter is set to `existing`"
             }
         },
         "SQLServerUsername": {
@@ -323,13 +103,6 @@
             "defaultValue": "",
             "metadata": {
                 "description": "SQL Server user password. If the 'SQLNewOrExisting' parameter is set to `existing` this is the user password for the existing SQL server. Otherwise this password will be set on the SQL server created."
-            }
-        },
-        "SQLServerPort": {
-            "type": "int",
-            "defaultValue": 1433,
-            "metadata": {
-                "description": "SQL Server port. If the 'SQLNewOrExisting' parameter is set to `existing` this port will be used."
             }
         },
         "UipathAdminUsername": {
@@ -358,17 +131,6 @@
             "defaultValue": "",
             "metadata": {
                 "description": "Virtual Machine User password"
-            }
-        },
-        "enableClusterBackup": {
-            "type": "bool",
-            "defaultValue": true,
-            "allowedValues": [
-                true,
-                false
-            ],
-            "metadata": {
-                "description": "Deploy the external NFS fileshare. The backup will be enabled at cluster level if the parameter Run Automation Suite Install is set to true."
             }
         },
         "actionCenterInstallFlag": {
@@ -440,10 +202,6 @@
             "metadata": {
                 "description": "Flag which determines whether Document Understanding should be installed."
             }
-        },
-        "tagsByResource": {
-            "type": "object",
-            "defaultValue": {}
         }
     },
     "variables": {
@@ -529,9 +287,9 @@
                 "value": "[concat('\"', variables('removeNodeUtilsUrl'), '\"')]"
             }
         ],
-        "URLFromVersion": "[concat('https://download.uipath.com/automation-suite/', parameters('automationSuiteVersion'),'/installer-',parameters('automationSuiteVersion'),'.zip')]",
-        "automationSuiteInstallerURL": "[if(equals(parameters('automationSuiteInstallerURL'), 'None'),variables('URLFromVersion'), parameters('automationSuiteInstallerURL'))]",
-        "baseName": "[substring(parameters('dnsLoadBalancer'), 0, 5)]",
+        "URLFromVersion": "https://download.uipath.com/automation-suite/2022.4.0/installer-2022.4.0.zip",
+        "automationSuiteInstallerURL": "[variables('URLFromVersion')]",
+        "baseName": "[substring(concat('u',uniqueString(resourceGroup().id, deployment().name)), 0, 5)]",
         "preChecksDeploymentName": "[concat('PreChecks-',substring(uniqueString(variables('baseName')),0,6))]",
         "automationsDeploymentName": "[concat('automations-',substring(uniqueString(variables('baseName')),0,6))]",
         "vaultDeploymentName": "[concat('Vault-',substring(uniqueString(variables('baseName')),0,6))]",
@@ -543,11 +301,13 @@
         "databaseDeploymentName": "[concat('Database-',substring(uniqueString(variables('baseName')),0,6))]",
         "computeDeploymentName": "[concat('Compute-',substring(uniqueString(variables('baseName')),0,6))]",
         "certificateConfig": {
-            "enableCustomCertificates": "[parameters('enableCustomCertificates')]",
-            "customServerCertificate": "[parameters('customServerCertificate')]",
-            "customServerCertKey": "[parameters('customServerCertKey')]",
-            "customServerCertAuthorityBundle": "[parameters('customServerCertAuthorityBundle')]"
+            "enableCustomCertificates": "[bool('false')]",
+            "customServerCertificate": "",
+            "customServerCertKey": "",
+            "customServerCertAuthorityBundle": ""
         },
+        "dnsLoadBalancer": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
+        "location": "[resourceGroup().location]",
         "enabledServices": {
             "sharedSuite": {
                 "flag": true,
@@ -682,7 +442,7 @@
                 }
             }
         },
-        "existingSQL": "[if(equals(parameters('SqlNewOrExisting'), 'existing'), true(), false())]",
+        "existingSQL": "[bool('false')]",
         "templateVersionTag": {
             "templateVersion": "22.4.3"
         }
@@ -706,7 +466,7 @@
             "name": "[variables('preChecksDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -717,16 +477,16 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "virtualNetworkNewOrExisting": {
-                        "value": "[parameters('virtualNetworkNewOrExisting')]"
+                        "value": "new"
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
+                        "value": ""
                     },
                     "existingVirtualNetworkName": {
-                        "value": "[parameters('existingVirtualNetworkName')]"
+                        "value": ""
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -765,10 +525,10 @@
                         "value": "[concat(variables('baseName'),'-msi')]"
                     },
                     "fqdn": {
-                        "value": "[parameters('dnsLoadBalancer')]"
+                        "value": "[variables('dnsLoadBalancer')]"
                     },
                     "acceptLicenseAgreement": {
-                        "value": "[parameters('acceptLicenseAgreement')]"
+                        "value": "[bool('true')]"
                     },
                     "actionCenterInstallFlag": {
                         "value": "[parameters('actionCenterInstallFlag')]"
@@ -804,7 +564,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -813,7 +573,7 @@
             "name": "[variables('vaultDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
@@ -845,13 +605,13 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "templateVersionTag": {
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -865,7 +625,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]",
                 "[resourceId('Microsoft.Resources/deployments', variables('vaultDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -873,10 +633,10 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "SQLServerName": {
-                        "value": "[concat(substring(parameters('dnsLoadBalancer'),0,4),'sql')]"
+                        "value": "[concat(substring(variables('dnsLoadBalancer'),0,4),'sql')]"
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -901,7 +661,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -910,7 +670,7 @@
             "name": "[variables('networkDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
@@ -921,37 +681,37 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "dnsLoadBalancer": {
-                        "value": "[parameters('dnsLoadBalancer')]"
+                        "value": "[variables('dnsLoadBalancer')]"
                     },
                     "createNewVnet": {
-                        "value": "[if(equals(parameters('virtualNetworkNewOrExisting'), 'new'), bool('true'), bool('false'))]"
+                        "value": "[bool('true')]"
                     },
                     "existingVirtualNetworkName": {
-                        "value": "[parameters('existingVirtualNetworkName')]"
+                        "value": ""
                     },
                     "existingVirtualNetworkResourceGroup": {
-                        "value": "[parameters('existingVirtualNetworkResourceGroup')]"
+                        "value": ""
                     },
                     "existingSubnetName": {
-                        "value": "[parameters('existingSubnetName')]"
+                        "value": ""
                     },
                     "deployBastionHost": {
-                        "value": "[parameters('deployBastionHost')]"
+                        "value": "[bool('true')]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
                     },
                     "enableClusterBackup": {
-                        "value": "[parameters('enableClusterBackup')]"
+                        "value": "[bool('true')]"
                     },
                     "templateVersionTag": {
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -959,9 +719,9 @@
         {
             "name": "[variables('backupDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
-            "condition": "[parameters('enableClusterBackup')]",
+            "condition": true,
             "apiVersion": "2019-10-01",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]"
             ],
@@ -975,7 +735,7 @@
                         "value": "[variables('baseName')]"
                     },
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "subnetId": {
                         "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
@@ -984,7 +744,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -996,7 +756,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -1004,7 +764,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "baseName": {
                         "value": "[variables('baseName')]"
@@ -1013,7 +773,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -1029,7 +789,7 @@
                 "[resourceId('Microsoft.Resources/deployments', variables('dnsDeploymentName'))]",
                 "[resourceId('Microsoft.Resources/deployments',variables('backupDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -1037,7 +797,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "certificateConfig": {
                         "value": "[variables('certificateConfig')]"
@@ -1052,16 +812,16 @@
                         "value": "[parameters('serverNodeCount')]"
                     },
                     "serverNodeHostname": {
-                        "value": "[parameters('serverNodeHostname')]"
+                        "value": "uipath-server-"
                     },
                     "agentNodeHostname": {
-                        "value": "[parameters('agentNodeHostname')]"
+                        "value": "uipath-ag-"
                     },
                     "gpuNodeHostname": {
-                        "value": "[parameters('gpuNodeHostname')]"
+                        "value": "uipath-gp-"
                     },
                     "taskMiningNodeHostName": {
-                        "value": "[parameters('taskMiningNodeHostName')]"
+                        "value": "uipath-tm"
                     },
                     "agentNodeCount": {
                         "value": "[parameters('agentNodeCount')]"
@@ -1073,7 +833,7 @@
                         "value": "[parameters('serverNodeInstanceType')]"
                     },
                     "enableUltraDisks": {
-                        "value": "[parameters('enableUltraDisks')]"
+                        "value": "[bool('true')]"
                     },
                     "agentNodeInstanceType": {
                         "value": "[parameters('agentNodeInstanceType')]"
@@ -1178,16 +938,16 @@
                         "value": "[parameters('documentUnderstandingInstallFlag')]"
                     },
                     "RunAutomationSuiteInstall": {
-                        "value": "[parameters('RunAutomationSuiteInstall')]"
+                        "value": "[bool('true')]"
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "sqlFQDN": {
-                        "value": "[if(variables('existingSQL'),parameters('sqlServerFqdnOrIP'),reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value)]"
+                        "value": "[reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value]"
                     },
                     "SQLServerPort": {
-                        "value": "[if(variables('existingSQL'),parameters('SQLServerPort'),1433)]"
+                        "value": 1433
                     },
                     "SQLServerAdminLogin": {
                         "reference": {
@@ -1221,22 +981,22 @@
                         "value": "[variables('automationSuiteInstallerURL')]"
                     },
                     "automationSuiteACRJson": {
-                        "value": "[parameters('automationSuiteAdvancedConfig')]"
+                        "value": "{}"
                     },
                     "enableClusterBackup": {
-                        "value": "[parameters('enableClusterBackup')]"
+                        "value": "[bool('true')]"
                     },
                     "fileshareEndpoint": {
-                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value, 'none')]"
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value]"
                     },
                     "fileshareMountpath": {
-                        "value": "[if(parameters('enableClusterBackup'), reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value, 'none')]"
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value]"
                     },
                     "templateVersionTag": {
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -1245,12 +1005,12 @@
             "name": "[variables('postInstallValidationDeploymentName')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "condition": "[parameters('RunAutomationSuiteInstall')]",
+            "condition": true,
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]",
                 "[resourceId('Microsoft.Resources/deployments', variables('automationsDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -1258,7 +1018,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "storageAccountName": {
                         "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
@@ -1270,10 +1030,10 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerPublicIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "customCertificate": {
-                        "value": "[if(parameters('enableCustomCertificates'), parameters('customServerCertificate'), 'installer-generated')]"
+                        "value": "installer-generated"
                     },
                     "automationAccount": {
                         "value": "[reference(variables('automationsDeploymentName')).outputs.automationAccount.value]"
@@ -1288,7 +1048,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -1300,7 +1060,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -1314,13 +1074,13 @@
                         "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
                     },
                     "clusterFQDN": {
-                        "value": "[if(parameters('enableCustomDomain'), parameters('customDomain'), reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value)]"
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
                     },
                     "templateVersionTag": {
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
@@ -1332,7 +1092,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
             ],
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Resources/deployments'), parameters('tagsByResource')['Microsoft.Resources/deployments'], json('{}')) ]",
+            "tags": "[ json('{}') ]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -1340,7 +1100,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('location')]"
+                        "value": "[variables('location')]"
                     },
                     "msiClientId": {
                         "value": "[reference(variables('preChecksDeploymentName')).outputs.msiClientId.value]"
@@ -1373,7 +1133,7 @@
                         "value": "[variables('templateVersionTag')]"
                     },
                     "tagsByResource": {
-                        "value": "[parameters('tagsByResource')]"
+                        "value": "[ json('{}') ]"
                     }
                 }
             }
