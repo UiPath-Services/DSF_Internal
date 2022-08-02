@@ -307,7 +307,7 @@
             "customServerCertAuthorityBundle": ""
         },
         "dnsLoadBalancer": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
-        "location": "[resourceGroup().location]",
+        "location": "westeurope",
         "enabledServices": {
             "sharedSuite": {
                 "flag": true,
