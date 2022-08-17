@@ -1,0 +1,6 @@
+{
+    "itemDisplayName": "Novigo",
+    "description": "This template creates a VM with DSF Demos installed. ",
+    "githubUsername": "mihaicde",
+    "summary": "Deploys DSF Demos instance as an IaaS environment in Azure using a clone image."
+}
