@@ -448,6 +448,697 @@
         }
     },
     "functions": [],
+    "resources": [
+        {
+            "apiVersion": "2020-06-01",
+            "name": "pid-4b8f227e-0b51-475b-8c51-d8c2c5b92b39",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "name": "[variables('preChecksDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('preValidateTemplateUri')]"
+                },
+                "parameters": {
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "virtualNetworkNewOrExisting": {
+                        "value": "new"
+                    },
+                    "existingVirtualNetworkResourceGroup": {
+                        "value": ""
+                    },
+                    "existingVirtualNetworkName": {
+                        "value": ""
+                    },
+                    "certificateConfig": {
+                        "value": "[variables('certificateConfig')]"
+                    },
+                    "enabledServices": {
+                        "value": "[variables('enabledServices')]"
+                    },
+                    "serverNodeInstanceType": {
+                        "value": "[parameters('serverNodeInstanceType')]"
+                    },
+                    "agentNodeInstanceType": {
+                        "value": "[parameters('agentNodeInstanceType')]"
+                    },
+                    "gpuNodeInstanceType": {
+                        "value": "[parameters('gpuNodeInstanceType')]"
+                    },
+                    "taskMiningNodeType": {
+                        "value": "[parameters('taskMiningNodeType')]"
+                    },
+                    "serverNodeCount": {
+                        "value": "[parameters('serverNodeCount')]"
+                    },
+                    "agentNodeCount": {
+                        "value": "[parameters('agentNodeCount')]"
+                    },
+                    "gpuNodeCount": {
+                        "value": "[parameters('gpuNodeCount')]"
+                    },
+                    "installTaskMining": {
+                        "value": "[parameters('taskMiningInstallFlag')]"
+                    },
+                    "scriptUris": {
+                        "value": "[variables('scriptUris')]"
+                    },
+                    "msiName": {
+                        "value": "[concat(variables('baseName'),'-msi')]"
+                    },
+                    "fqdn": {
+                        "value": "[variables('dnsLoadBalancer')]"
+                    },
+                    "acceptLicenseAgreement": {
+                        "value": "[bool('true')]"
+                    },
+                    "actionCenterInstallFlag": {
+                        "value": "[parameters('actionCenterInstallFlag')]"
+                    },
+                    "testManagerInstallFlag": {
+                        "value": "[parameters('testManagerInstallFlag')]"
+                    },
+                    "insightsInstallFlag": {
+                        "value": "[parameters('insightsInstallFlag')]"
+                    },
+                    "dataServiceInstallFlag": {
+                        "value": "[parameters('dataServiceInstallFlag')]"
+                    },
+                    "automationHubInstallFlag": {
+                        "value": "[parameters('automationHubInstallFlag')]"
+                    },
+                    "automationOpsInstallFlag": {
+                        "value": "[parameters('automationOpsInstallFlag')]"
+                    },
+                    "appsInstallFlag": {
+                        "value": "[parameters('appsInstallFlag')]"
+                    },
+                    "aiCenterInstallFlag": {
+                        "value": "[parameters('aiCenterInstallFlag')]"
+                    },
+                    "taskMiningInstallFlag": {
+                        "value": "[parameters('taskMiningInstallFlag')]"
+                    },
+                    "documentUnderstandingInstallFlag": {
+                        "value": "[parameters('documentUnderstandingInstallFlag')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('vaultDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "tags": "[ json('{}') ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vaultTemplateUri')]"
+                },
+                "parameters": {
+                    "SQLServerUsername": {
+                        "value": "[parameters('SQLServerUsername')]"
+                    },
+                    "SQLServerPassword": {
+                        "value": "[parameters('SQLServerPassword')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('UiPathAdminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('UiPathAdminPassword')]"
+                    },
+                    "vmAdminUsername": {
+                        "value": "[parameters('vmAdminUsername')]"
+                    },
+                    "vmAdminPassword": {
+                        "value": "[parameters('vmAdminPassword')]"
+                    },
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('databaseDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "condition": "[not(variables('existingSQL'))]",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('vaultDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('databaseTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "SQLServerName": {
+                        "value": "[concat(substring(variables('dnsLoadBalancer'),0,4),'sql')]"
+                    },
+                    "SQLServerAdminLogin": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "SQLServerUsername"
+                        }
+                    },
+                    "SQLServerAdminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "SQLServerPassword"
+                        }
+                    },
+                    "dbNames": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.dbNames.value]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('networkDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "tags": "[ json('{}') ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('networkTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "dnsLoadBalancer": {
+                        "value": "[variables('dnsLoadBalancer')]"
+                    },
+                    "createNewVnet": {
+                        "value": "[bool('true')]"
+                    },
+                    "existingVirtualNetworkName": {
+                        "value": ""
+                    },
+                    "existingVirtualNetworkResourceGroup": {
+                        "value": ""
+                    },
+                    "existingSubnetName": {
+                        "value": ""
+                    },
+                    "deployBastionHost": {
+                        "value": "[bool('true')]"
+                    },
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "enableClusterBackup": {
+                        "value": "[bool('true')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('backupDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "condition": true,
+            "apiVersion": "2019-10-01",
+            "tags": "[ json('{}') ]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('backupTemplateUri')]"
+                },
+                "parameters": {
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "subnetId": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('storageDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('preChecksDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('storageTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('computeDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('databaseDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('vaultDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('storageDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('dnsDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments',variables('backupDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('computeTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "certificateConfig": {
+                        "value": "[variables('certificateConfig')]"
+                    },
+                    "subnetId": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.subnetId.value]"
+                    },
+                    "ILBIp": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
+                    },
+                    "serverNodeCount": {
+                        "value": "[parameters('serverNodeCount')]"
+                    },
+                    "serverNodeHostname": {
+                        "value": "uipath-server-"
+                    },
+                    "agentNodeHostname": {
+                        "value": "uipath-ag-"
+                    },
+                    "gpuNodeHostname": {
+                        "value": "uipath-gp-"
+                    },
+                    "taskMiningNodeHostName": {
+                        "value": "uipath-tm"
+                    },
+                    "agentNodeCount": {
+                        "value": "[parameters('agentNodeCount')]"
+                    },
+                    "gpuNodeCount": {
+                        "value": "[parameters('gpuNodeCount')]"
+                    },
+                    "serverNodeInstanceType": {
+                        "value": "[parameters('serverNodeInstanceType')]"
+                    },
+                    "enableUltraDisks": {
+                        "value": "[bool('true')]"
+                    },
+                    "agentNodeInstanceType": {
+                        "value": "[parameters('agentNodeInstanceType')]"
+                    },
+                    "gpuNodeInstanceType": {
+                        "value": "[parameters('gpuNodeInstanceType')]"
+                    },
+                    "taskMiningNodeType": {
+                        "value": "[parameters('taskMiningNodeType')]"
+                    },
+                    "serverZones": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.serverZones.value]"
+                    },
+                    "agentZones": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.agentZones.value]"
+                    },
+                    "gpuZones": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.gpuZones.value]"
+                    },
+                    "isZoneResilient": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.isZoneResilient.value]"
+                    },
+                    "baseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "vmAdminUserName": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "vmAdminUsername"
+                        }
+                    },
+                    "vmAdminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "vmAdminPassword"
+                        }
+                    },
+                    "adminUserName": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "UiPathAdminUsername"
+                        }
+                    },
+                    "adminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "UiPathAdminPassword"
+                        }
+                    },
+                    "argoCDPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "argoCDPassword"
+                        }
+                    },
+                    "argoCDUserPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "argoCDUserPassword"
+                        }
+                    },
+                    "actionCenterInstallFlag": {
+                        "value": "[parameters('actionCenterInstallFlag')]"
+                    },
+                    "testManagerInstallFlag": {
+                        "value": "[parameters('testManagerInstallFlag')]"
+                    },
+                    "insightsInstallFlag": {
+                        "value": "[parameters('insightsInstallFlag')]"
+                    },
+                    "dataServiceInstallFlag": {
+                        "value": "[parameters('dataServiceInstallFlag')]"
+                    },
+                    "automationHubInstallFlag": {
+                        "value": "[parameters('automationHubInstallFlag')]"
+                    },
+                    "automationOpsInstallFlag": {
+                        "value": "[parameters('automationOpsInstallFlag')]"
+                    },
+                    "appsInstallFlag": {
+                        "value": "[parameters('appsInstallFlag')]"
+                    },
+                    "aiCenterInstallFlag": {
+                        "value": "[parameters('aiCenterInstallFlag')]"
+                    },
+                    "taskMiningInstallFlag": {
+                        "value": "[parameters('taskMiningInstallFlag')]"
+                    },
+                    "documentUnderstandingInstallFlag": {
+                        "value": "[parameters('documentUnderstandingInstallFlag')]"
+                    },
+                    "RunAutomationSuiteInstall": {
+                        "value": "[bool('true')]"
+                    },
+                    "clusterFQDN": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                    },
+                    "sqlFQDN": {
+                        "value": "[reference(variables('databaseDeploymentName')).outputs.SQLFQDN.value]"
+                    },
+                    "SQLServerPort": {
+                        "value": 1433
+                    },
+                    "SQLServerAdminLogin": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "SQLServerUsername"
+                        }
+                    },
+                    "SQLServerAdminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[reference(variables('vaultDeploymentName')).outputs.KVResourceId.value]"
+                            },
+                            "secretName": "SQLServerPassword"
+                        }
+                    },
+                    "existingSQL": {
+                        "value": "[variables('existingSQL')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
+                    },
+                    "containerName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.containerName.value]"
+                    },
+                    "scriptUris": {
+                        "value": "[variables('scriptUris')]"
+                    },
+                    "automationSuitePackage": {
+                        "value": "[variables('automationSuiteInstallerURL')]"
+                    },
+                    "automationSuiteACRJson": {
+                        "value": "{}"
+                    },
+                    "enableClusterBackup": {
+                        "value": "[bool('true')]"
+                    },
+                    "fileshareEndpoint": {
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareEndpoint.value]"
+                    },
+                    "fileshareMountpath": {
+                        "value": "[reference(variables('backupDeploymentName')).outputs.fileshareMountpath.value]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('postInstallValidationDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "condition": true,
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]",
+                "[resourceId('Microsoft.Resources/deployments', variables('automationsDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('postInstallValidationTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
+                    },
+                    "containerName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.containerName.value]"
+                    },
+                    "publicLoadBalancerIP": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerPublicIpAddress.value]"
+                    },
+                    "clusterFQDN": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                    },
+                    "customCertificate": {
+                        "value": "installer-generated"
+                    },
+                    "automationAccount": {
+                        "value": "[reference(variables('automationsDeploymentName')).outputs.automationAccount.value]"
+                    },
+                    "msiName": {
+                        "value": "[concat(variables('baseName'),'-msi')]"
+                    },
+                    "scriptUris": {
+                        "value": "[variables('scriptUris')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('dnsDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('networkDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('dnsTemplateUri')]"
+                },
+                "parameters": {
+                    "vnetId": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.vnetId.value]"
+                    },
+                    "privateLoadBalancerIpAddress": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.privateLoadBalancerIpAddress.value]"
+                    },
+                    "clusterFQDN": {
+                        "value": "[reference(variables('networkDeploymentName')).outputs.loadBalancerFQDN.value]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('automationsDeploymentName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', variables('computeDeploymentName'))]"
+            ],
+            "tags": "[ json('{}') ]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('automationsTemplateUri')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('location')]"
+                    },
+                    "msiClientId": {
+                        "value": "[reference(variables('preChecksDeploymentName')).outputs.msiClientId.value]"
+                    },
+                    "ServerVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.ServerVMSSName.value]"
+                    },
+                    "AgentVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.AgentVMSSName.value]"
+                    },
+                    "GpuVMSSName": {
+                        "value": "[reference(variables('computeDeploymentName')).outputs.GpuVMSSName.value]"
+                    },
+                    "BaseName": {
+                        "value": "[variables('baseName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.storageAccountName.value]"
+                    },
+                    "storageContainerName": {
+                        "value": "[reference(variables('storageDeploymentName')).outputs.containerName.value]"
+                    },
+                    "scriptsAndModulesObject": {
+                        "value": "[variables('scriptsAndModulesObject')]"
+                    },
+                    "automationAccountAdditionalVariables": {
+                        "value": "[variables('automationAccountAdditionalVariables')]"
+                    },
+                    "templateVersionTag": {
+                        "value": "[variables('templateVersionTag')]"
+                    },
+                    "tagsByResource": {
+                        "value": "[ json('{}') ]"
+                    }
+                }
+            }
+        }
+    ],
     "outputs": {
         "Documentation": {
             "type": "string",
