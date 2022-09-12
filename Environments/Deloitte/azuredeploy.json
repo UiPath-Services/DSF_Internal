@@ -46,7 +46,7 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
        "imageName": "dsf_partner",
         "galleryName": "dsf_images",
-        "imageVersion": "1.7.0",
+        "imageVersion": "1.7.1",
         "imageRef": "[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','dsf-aks-internal','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
         "scriptUriBase": "https://raw.githubusercontent.com//UiPath-Services/DSF_Internal/main/Scripts/bootstrap-external.ps1",
         "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
