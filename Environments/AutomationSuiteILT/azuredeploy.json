@@ -1,0 +1,309 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Username": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Username for VM and SQL login"
+            }
+        },
+        "Password": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Password for VM and SQL login"
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "domainName": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
+        "fqdn": "[concat(variables('domainName'), '.', variables('location'), '.cloudapp.azure.com')]",
+        "baseName": "[substring(variables('domainName'), 0, 5)]",
+        
+        // vnet + nsg
+        "VnetAddressSpace": "10.0.0.0/16",
+        "SubnetAddressSpace": "10.0.0.0/24",
+        "NSGName": "[concat(variables('baseName'),'-NSG')]",
+        "VNETName": "[concat(variables('baseName'),'-VNet')]",
+
+        // vm
+        "serverNodeInstanceType": "Standard_D16s_v3"
+    },
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-08-01",
+            "tags": "[json('{}')]",
+            "name": "[variables('NSGName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Https",
+                        "properties": {
+                            "description": "Allows Https traffic",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "SSH",
+                        "properties": {
+                            "description": "Allows SSH connections",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 130,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "tags": "[json('{}')]",
+            "apiVersion": "2020-05-01",
+            "name": "[variables('VNetName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('NSGName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('VnetAddressSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "subnet",
+                        "properties": {
+                            "addressPrefix": "[variables('SubnetAddressSpace')]",
+                            "serviceEndpoints": "[createArray()]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('NSGName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2018-09-01",
+            "type": "Microsoft.Network/privateDnsZones",
+            "name": "[variables('fqdn')]",
+            "tags": "[json('{}')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('VNETName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines/', concat(variables('baseName'),'-VM'))]"
+            ],
+            "location": "global"
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(variables('fqdn'), '/link')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('fqdn'))]"
+            ],
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/A",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(variables('fqdn'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('fqdn'))]"
+            ],
+            "properties": {
+                "ttl": 300,
+                "aRecords": [
+                    {
+                        "ipv4Address": "[reference(concat(variables('baseName'),'-VM-PIP')).IpAddress]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/A",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(variables('fqdn'), '/*')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('fqdn'))]"
+            ],
+            "properties": {
+                "ttl": 300,
+                "aRecords": [
+                    {
+                        "ipv4Address": "[reference(concat(variables('baseName'),'-VM-PIP')).IpAddress]"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(substring(variables('baseName'),0,4),'-SQL')]",
+            "type": "Microsoft.Sql/servers",
+            "tags": "[json('{}')]",
+            "location": "[variables('location')]",
+            "apiVersion": "2020-08-01-preview",
+            "properties": {
+                "administratorLogin": "[parameters('Username')]",
+                "administratorLoginPassword": "[parameters('Password')]",
+                "version": "12.0"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2021-02-01-preview",
+                    "name": "AllowAllWindowsAzureIps",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(substring(variables('baseName'),0,4),'-SQL'))]"
+                    ],
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[concat(variables('baseName'),'-VM-PIP')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "tags": "[json('{}')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('domainName')]"
+                }
+            },
+            "sku": {
+                "name": "Standard"
+            }
+        },
+        {
+            "name": "[concat(variables('baseName'),'-Server-NICS')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-05-01",
+            "tags": "[json('{}')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('VNETName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses/', concat(variables('baseName'),'-VM-PIP'))]"
+            ],
+            "location": "[variables('location')]",
+            "properties": {
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSGName'))]"
+                },
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VNetName'), 'subnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(variables('baseName'),'-VM-PIP'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-11-01",
+            "name": "[concat(variables('baseName'),'-VM')]",
+            "tags": "[json('{}')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('VNETName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces/', concat(variables('baseName'),'-Server-NICS'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses/', concat(variables('baseName'),'-VM-PIP'))]"
+            ],
+            "location": "[variables('location')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('serverNodeInstanceType')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        },
+                        "diskSizeGB": 256
+                    },
+                    "dataDisks": [
+                        {
+                            "diskSizeGB": 256,
+                            "lun": 1,
+                            "createOption": "Empty",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        },
+                        {
+                            "diskSizeGB": 512,
+                            "lun": 2,
+                            "createOption": "Empty",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        },
+                        {
+                            "diskSizeGB": 16,
+                            "lun": 3,
+                            "createOption": "Empty",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
+                        }
+                    ],
+                    "imageReference": {
+                        "publisher": "RedHat",
+                        "offer": "RHEL",
+                        "sku": "8_5",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('baseName'),'-Server-NICS'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('baseName'),'-VM')]",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}
