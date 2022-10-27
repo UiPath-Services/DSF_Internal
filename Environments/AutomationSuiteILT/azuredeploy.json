@@ -310,6 +310,10 @@
             "value": "[variables('fqdn')]",
             "type": "string"
         },
+        "sql-fqdn": {
+            "value": "[reference(resourceId('Microsoft.Sql/servers', concat(substring(variables('baseName'),0,4),'-SQL'))).fullyQualifiedDomainName]",
+            "type": "string"
+        },
         "username": {
             "value": "[parameters('Username')]",
             "type": "string"
