@@ -281,6 +281,14 @@
                             "managedDisk": {
                                 "storageAccountType": "Premium_LRS"
                             }
+                        },
+                        {
+                            "diskSizeGB": 512,
+                            "lun": 4,
+                            "createOption": "Empty",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
                         }
                     ],
                     "imageReference": {
