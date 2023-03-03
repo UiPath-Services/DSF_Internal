@@ -2,16 +2,25 @@
    "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
    "contentVersion":"1.0.0.0",
    "parameters":{
-      "version":{
-         "defaultValue":"1.0.0",
-         "allowedValues":[
-            "1.0.0"
-         ],
-         "type":"String",
-         "metadata":{
-            "description":"Process Mining Image Version"
+      "adminusername": {
+         "type": "String",
+         "metadata": {
+             "description": "VMs Admin username"
          }
-      },
+     },
+     "adminpassword": {
+         "type": "String",
+         "metadata": {
+             "description": "VMs Admin password"
+         }
+     },
+     "licenseCode": {
+         "defaultValue": "",
+         "type": "String",
+         "metadata": {
+             "description": "ProcessMining license"
+         }
+     },	  
       "location":{
          "defaultValue":"eastus",
          "allowedValues":[
@@ -41,8 +50,14 @@
       "subnetRef":"[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
       "imageName":"processMining",
       "galleryName":"uipathlabsgallery",
-      "imageVersion":"[parameters('version')]",
-      "imageRef":"[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','uipathlabsgallery','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]"
+      "imageVersion":"1.0.0",
+      "imageRef":"[resourceId('911c7067-5700-4b8e-9ce1-f9dd06cbea43','uipathlabsgallery','Microsoft.Compute/galleries/images/versions',variables('galleryName'), variables('imageName'), variables('imageVersion'))]",
+      "scriptUriBase": "https://raw.githubusercontent.com/UiPath-Services/DSF_Internal/main/Environments/ProcessMining/Setup/bootstrap.ps1",
+        "scriptUriNamePieces": "[split(variables('scriptUriBase'), '/')]",
+        "scriptFileString": "[variables('scriptUriNamePieces')[sub(length(variables('scriptUriNamePieces')), 1)]]",
+        "scriptFileBreakString": "[split(variables('scriptFileString'), '?')]",
+        "scriptFileName": "[variables('scriptFileBreakString')[0]]",
+        "configurePM": "[concat ('powershell -ExecutionPolicy Unrestricted -File ',' ', variables('scriptFileName'),' ','-licenseCode',' ',parameters('licenseCode'))]"
    },
    "resources":[
       {
@@ -196,20 +211,41 @@
          "dependsOn":[
             "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
          ]
-      }
+      },
+      {
+         "type": "Microsoft.Compute/virtualMachines/extensions",
+         "name": "[concat(variables('vmName'),'/CustomScriptExtension')]",
+         "apiVersion": "2015-06-15",
+         "location": "[variables('location')]",
+         "properties": {
+             "publisher": "Microsoft.Compute",
+             "type": "CustomScriptExtension",
+             "typeHandlerVersion": "1.7",
+             "autoUpgradeMinorVersion": true,
+             "settings": {
+                 "fileUris": "[split(variables('scriptUriBase'), ' ')]"
+             },
+             "protectedSettings": {
+                 "commandToExecute": "[variables('configurePM')]"
+             }
+         },
+         "dependsOn": [
+             "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+         ]
+     }
    ],
    "outputs":{
-      "FQDN":{
-         "value":"[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
-         "type":"string"
-      },
-      "adminusername":{
-         "type":"String",
-         "value":"admin_1"
-      },
-      "adminpassword":{
-         "type":"String",
-         "value":"1!Nought-roy-ripoff"
-      }
-   }
+      "adminusername": {
+         "type": "String",
+         "value": "[parameters('adminusername')]"
+     },
+     "adminpassword": {
+         "type": "String",
+         "value": "[parameters('adminpassword')]"
+     },
+     "vmDNS": {
+         "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]",
+         "type": "string"							   
+     }
+ }
 }
