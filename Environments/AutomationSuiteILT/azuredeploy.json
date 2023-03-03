@@ -31,7 +31,7 @@
         "VNETName": "[concat(variables('baseName'),'-VNet')]",
 
         // vm
-        "serverNodeInstanceType": "Standard_D16s_v3"
+        "serverNodeInstanceType": "Standard_F16s_v2"
     },
     "functions": [],
     "resources": [
