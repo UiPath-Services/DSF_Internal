@@ -16,10 +16,25 @@
             "metadata": {
                 "description": "Password for VM and SQL login"
             }
+        },
+        
+        "location": {
+            "defaultValue": "eastus",
+            "allowedValues": [
+                "eastus",
+                "westeurope",
+                "centralus",
+                "centralindia",
+                "japaneast"	
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "Resources location"
+            }
         }
     },
     "variables": {
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "domainName": "[concat('u',uniqueString(resourceGroup().id, deployment().name))]",
         "fqdn": "[concat(variables('domainName'), '.', variables('location'), '.cloudapp.azure.com')]",
         "baseName": "[substring(variables('domainName'), 0, 5)]",
