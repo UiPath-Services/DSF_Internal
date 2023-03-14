@@ -206,7 +206,16 @@
                      "id":"[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                   }
                ]
-            }
+            },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminusername": "[parameters('adminusername')]",
+                    "adminpassword": "[parameters('adminpassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": false,
+                        "provisionVmAgent": true
+                    }
+                }
          },
          "dependsOn":[
             "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
